@@ -13,6 +13,7 @@
     "react-scripts": "3.4.3"
   },
   "scripts": {
+    "deploy": "yarn build && firebase deploy --only hosting",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
