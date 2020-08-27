@@ -19,7 +19,8 @@ function Signin() {
   const { currentUser } = useContext(AuthContext);
 
   if (currentUser) {
-    return <Redirect to="/home" />;
+    // TODO or to /professor
+    return <Redirect to="/student" />;
   }
 
   return (

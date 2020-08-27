@@ -10,7 +10,10 @@ import {
 import { AuthProvider } from "./util/auth";
 import PrivateRoute from "./util/PrivateRoute";
 import Signin from "./components/Signin";
-import Home from "./components/Home";
+import Student from "./components/Student";
+// professor
+import LinkRedirect from "./components/LinkRedirect";
+// join/uid
 import "./styles/App.css";
 
 const PageNotFound = () => {
@@ -33,7 +36,8 @@ function App() {
         <Router>
           <Switch>
             <Route exact path="/" component={Signin} />
-            <PrivateRoute exact path="/home" component={Home} />
+            <PrivateRoute exact path="/student" component={Student} />
+            <PrivateRoute exact path="/link/:slug" component={LinkRedirect} />
             <Route component={PageNotFound} />
           </Switch>
         </Router>

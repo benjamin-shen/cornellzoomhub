@@ -5,6 +5,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState();
+  const [netid, setNetid] = useState();
   const [pending, setPending] = useState(true);
 
   useEffect(() => {
@@ -29,12 +30,19 @@ export const AuthProvider = ({ children }) => {
     });
   }, []);
 
+  useEffect(() => {
+    if (currentUser) {
+      const netidMatch = currentUser.email.match(/^([^@]*)@/);
+      setNetid(netidMatch && netidMatch[1]);
+    }
+  }, [currentUser]);
+
   if (pending) {
     return <p className="message">Loading...</p>;
   }
 
   return (
-    <AuthContext.Provider value={{ currentUser }}>
+    <AuthContext.Provider value={{ currentUser, netid }}>
       {children}
     </AuthContext.Provider>
   );

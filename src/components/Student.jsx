@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../util/auth";
 import "../styles/Home.css";
 
-function Home() {
+function Student() {
   const { currentUser } = useContext(AuthContext);
 
   return (
@@ -15,4 +15,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Student;
