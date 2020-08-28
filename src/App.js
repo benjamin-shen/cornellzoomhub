@@ -24,7 +24,6 @@ function App() {
   return (
     <div className="app">
       <Helmet>
-        <meta charSet="utf-8" />
         <title>Cornell Zoom Hub</title>
         <meta name="title" content="Cornell Zoom Hub" />
         <meta

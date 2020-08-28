@@ -1,5 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
-import { Helmet } from "react-helmet";
+import React, { useContext } from "react";
 import { Redirect } from "react-router-dom";
 
 import app, { GoogleAuthProvider } from "../util/base";

@@ -46,6 +46,14 @@ function LinkRedirect({
 
   return (
     <div className="link-redirect">
+      <Helmet>
+        <title>Cornell Zoom Hub | Redirecting</title>
+        <meta name="title" content="Cornell Zoom Hub | Redirecting" />
+        <meta
+          name="description"
+          content="Cornell Zoom Hub | Redirecting to external link..."
+        />
+      </Helmet>
       <p className="message">Redirecting...</p>
     </div>
   );

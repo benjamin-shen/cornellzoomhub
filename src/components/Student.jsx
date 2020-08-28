@@ -13,7 +13,18 @@ const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
   const [slugInput, setSlugInput] = useState("");
   const [nameInput, setNameInput] = useState("");
   const [linkInput, setLinkInput] = useState("");
+  const [urlLink, setUrlLink] = useState("");
   const [pending, setPending] = useState(false);
+
+  useEffect(() => {
+    setUrlLink(
+      linkInput &&
+        linkInput.indexOf("://") === -1 &&
+        linkInput.indexOf("mailto:") === -1
+        ? "http://" + linkInput
+        : linkInput
+    );
+  }, [linkInput]);
 
   const addLink = async (slug, name, url) => {
     if (!slug) {
@@ -27,10 +38,6 @@ const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
       setError("Missing url link.");
       return;
     }
-    const urlLink =
-      url.indexOf("://") === -1 && url.indexOf("mailto:") === -1
-        ? "http://" + url
-        : url;
 
     setError("");
     setPending(true);
@@ -107,10 +114,13 @@ const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
         required
       />
       {pending ? (
-        <p className="text-info">Adding link at /link/{slugInput}</p>
+        <p className="text-info">
+          Setting redirect link to {urlLink} at /link/{slugInput}
+        </p>
       ) : (
         <button type="submit" className="btn btn-outline-primary mb-2">
-          Add link{slugInput && " at /link/" + slugInput}
+          Set redirect link{linkInput && " to " + linkInput}
+          {slugInput && " at /link/" + slugInput}
         </button>
       )}
     </form>
@@ -121,47 +131,45 @@ function ExistingLinks({ netid, refresh }) {
   const [linkDocs, setLinkDocs] = useState([]);
   const [links, setLinks] = useState([]);
 
-  const getLinks = () => {
-    users
-      .doc(netid)
-      .collection("links")
-      .where("url", ">", "")
-      .get()
-      .then((docs) => {
-        setLinkDocs(docs);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const formatLinks = () => {
-    const links = [];
-    linkDocs.forEach((linkDoc) => {
-      links.push({
-        id: linkDoc.id,
-        data: linkDoc.data(),
-      });
-    });
-    links.sort((a, b) => (a.id > b.id ? 1 : -1));
-    return links.map(({ id, data }) => {
-      if (id.match(/^[a-z0-9-+]+$/) && data && data.url) {
-        return (
-          <h2 key={id}>
-            <Link to={"/link/" + id}>
-              {id || data.name} ({data.url})
-            </Link>
-          </h2>
-        );
-      }
-    });
-  };
-
   useEffect(() => {
+    const getLinks = () => {
+      users
+        .doc(netid)
+        .collection("links")
+        .where("url", ">", "")
+        .get()
+        .then((docs) => {
+          setLinkDocs(docs);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
     getLinks();
-  }, [refresh]);
+  }, [refresh, netid]);
 
   useEffect(() => {
+    const formatLinks = () => {
+      const links = [];
+      linkDocs.forEach((linkDoc) => {
+        links.push({
+          id: linkDoc.id,
+          data: linkDoc.data(),
+        });
+      });
+      links.sort((a, b) => (a.id > b.id ? 1 : -1));
+      return links
+        .filter(({ id, data }) => id.match(/^[a-z0-9-+]+$/) && data && data.url)
+        .map(({ id, data }) => {
+          return (
+            <h2 key={id}>
+              <Link to={"/link/" + id}>
+                {id || data.name} ({data.url})
+              </Link>
+            </h2>
+          );
+        });
+    };
     setLinks(formatLinks());
   }, [linkDocs]);
 
@@ -190,6 +198,11 @@ function Student() {
 
   return (
     <div className="home">
+      <Helmet>
+        <title>Cornell Zoom Hub | Student</title>
+        <meta name="title" content="Cornell Zoom Hub | Student" />
+        <meta name="description" content="Cornell Zoom Hub | Student Page" />
+      </Helmet>
       <div className="container">
         <h1>Signed in{netid && " as " + netid}</h1>
         {!refresh && <ExistingLinks netid={netid} />}
@@ -217,7 +230,7 @@ function Student() {
               setAddingLink(true);
             }}
           >
-            Add Link
+            Create/edit Link
           </button>
         )}
         {error && <p className="text-danger">{error}</p>}
