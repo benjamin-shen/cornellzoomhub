@@ -131,6 +131,10 @@ const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
         </p>
       ) : (
         <>
+          <button type="submit" className="btn btn-outline-primary">
+            Set redirect link{linkInput && " to " + linkInput}
+            {slugInput && " at /link/" + slugInput}
+          </button>
           <button
             className="btn btn-outline-danger"
             onClick={() => {
@@ -138,10 +142,6 @@ const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
             }}
           >
             Cancel
-          </button>
-          <button type="submit" className="btn btn-outline-primary">
-            Set redirect link{linkInput && " to " + linkInput}
-            {slugInput && " at /link/" + slugInput}
           </button>
         </>
       )}
@@ -222,7 +222,7 @@ function ExistingLinks({ netid, refresh }) {
                   src={x}
                   width="22"
                   alt="Delete link."
-                  className="float-right"
+                  className="delete-link"
                   onClick={() => deleteLink(id)}
                 />
                 <h2>
