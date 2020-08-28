@@ -2,11 +2,14 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 
+import moment from "moment-timezone";
+
 import { AuthContext } from "../util/auth";
 import app from "../util/base";
 
-import "../styles/Home.css";
+import "../styles/Student.css";
 
+moment.tz.setDefault("America/New_York");
 const users = app.firestore().collection("users");
 
 const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
@@ -161,7 +164,9 @@ function ExistingLinks({ netid, refresh }) {
         .then((doc) => {
           if (doc.exists) {
             // TODO moment formatting
-            setLastUpdated(doc.data().lastUpdated.toDate().toString());
+            setLastUpdated(
+              moment(doc.data().lastUpdated.toDate()).format("LLLL")
+            );
           }
         })
         .catch((err) => {
@@ -181,16 +186,24 @@ function ExistingLinks({ netid, refresh }) {
           data: linkDoc.data(),
         });
       });
-      formattedLinks.sort((a, b) => (a.id > b.id ? 1 : -1));
+      formattedLinks.sort((a, b) => (a.data.name > b.data.name ? 1 : -1));
       return formattedLinks
         .filter(({ id, data }) => id.match(/^[a-z0-9-+]+$/) && data && data.url)
-        .map(({ id, data }) => {
+        .map(({ id, data: { name, url } }) => {
+          const cornellZoomLink = url.match(
+            /^(http:\/\/|https:\/\/)?(cornell\.zoom+\.us+\/j\/)([0-9]{9,11})(\?pwd=[a-zA-Z0-9]+)?$/
+          );
           return (
-            <h2 key={id}>
-              <Link to={"/link/" + id}>
-                {id || data.name} ({data.url})
-              </Link>
-            </h2>
+            <div key={id}>
+              <h2>
+                <Link to={"/link/" + id}>
+                  {name} {id !== name && `(/link/${id})`}
+                </Link>
+              </h2>
+              <p className={cornellZoomLink ? "text-success" : "text-info"}>
+                {url}
+              </p>
+            </div>
           );
         });
     };
@@ -226,7 +239,7 @@ function Student() {
   }, []);
 
   return (
-    <div className="home">
+    <div className="student">
       <Helmet>
         <title>Cornell Zoom Hub | Student</title>
         <meta name="title" content="Cornell Zoom Hub | Student" />

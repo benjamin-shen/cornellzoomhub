@@ -1,5 +1,7 @@
 .app {
   text-align: center;
+  min-width: 300px;
+  word-break: break-word;
 }
 .message {
   margin-left: 5px;
