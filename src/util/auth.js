@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState();
   const [netid, setNetid] = useState();
   const [pending, setPending] = useState(true);
+  const [isProf, setIsProf] = useState(null);
 
   useEffect(() => {
     app.auth().onAuthStateChanged((user) => {
@@ -34,15 +35,26 @@ export const AuthProvider = ({ children }) => {
     if (currentUser) {
       const netidMatch = currentUser.email.match(/^([^@]*)@/);
       setNetid(netidMatch && netidMatch[1]);
+      console.log('requesting...')
+      const db = app.firestore();
+      const users = db.collection('users');
+      if (netid) {
+        const doc = users.doc(netid);
+        doc.get().then(data => {
+          console.log(data.data());
+          setIsProf(data.data().isProfessor);
+        })
+      }
     }
-  }, [currentUser]);
+  }, [currentUser, netid]);
+
 
   if (pending) {
     return <p className="message">Loading...</p>;
   }
 
   return (
-    <AuthContext.Provider value={{ currentUser, netid }}>
+    <AuthContext.Provider value={{ currentUser, netid, isProf }}>
       {children}
     </AuthContext.Provider>
   );

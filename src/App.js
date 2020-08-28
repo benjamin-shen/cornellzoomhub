@@ -11,6 +11,7 @@ import { AuthProvider } from "./util/auth";
 import PrivateRoute from "./util/PrivateRoute";
 import Signin from "./components/Signin";
 import Student from "./components/Student";
+import Professor from './components/Professor';
 // professor
 import LinkRedirect from "./components/LinkRedirect";
 // join/uid
@@ -36,6 +37,7 @@ function App() {
           <Switch>
             <Route exact path="/" component={Signin} />
             <PrivateRoute exact path="/student" component={Student} />
+            <PrivateRoute exact path="/professor" component={Professor} />
             <PrivateRoute exact path="/link/:slug" component={LinkRedirect} />
             <Route component={PageNotFound} />
           </Switch>
