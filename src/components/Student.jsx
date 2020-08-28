@@ -50,7 +50,15 @@ const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
           name: name || slug,
           url: urlLink,
         })
-        .then(() => {
+        .then(async () => {
+          await users
+            .doc(netid)
+            .set({
+              lastUpdated: new Date(),
+            })
+            .catch((err) => {
+              console.log(err);
+            });
           setRefresh(true);
         })
         .catch((err) => {
@@ -130,6 +138,7 @@ const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
 function ExistingLinks({ netid, refresh }) {
   const [linkDocs, setLinkDocs] = useState([]);
   const [links, setLinks] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState("");
 
   useEffect(() => {
     const getLinks = () => {
@@ -145,20 +154,35 @@ function ExistingLinks({ netid, refresh }) {
           console.log(err);
         });
     };
+    const getLastUpdated = () => {
+      users
+        .doc(netid)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            // TODO moment formatting
+            setLastUpdated(doc.data().lastUpdated.toDate().toString());
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
     getLinks();
+    getLastUpdated();
   }, [refresh, netid]);
 
   useEffect(() => {
     const formatLinks = () => {
-      const links = [];
+      const formattedLinks = [];
       linkDocs.forEach((linkDoc) => {
-        links.push({
+        formattedLinks.push({
           id: linkDoc.id,
           data: linkDoc.data(),
         });
       });
-      links.sort((a, b) => (a.id > b.id ? 1 : -1));
-      return links
+      formattedLinks.sort((a, b) => (a.id > b.id ? 1 : -1));
+      return formattedLinks
         .filter(({ id, data }) => id.match(/^[a-z0-9-+]+$/) && data && data.url)
         .map(({ id, data }) => {
           return (
@@ -173,7 +197,12 @@ function ExistingLinks({ netid, refresh }) {
     setLinks(formatLinks());
   }, [linkDocs]);
 
-  return <div className="existing-links">{links}</div>;
+  return (
+    <div className="existing-links">
+      <p>{!!links.length && "Last Updated: " + lastUpdated}</p>
+      {links}
+    </div>
+  );
 }
 
 function Student() {
