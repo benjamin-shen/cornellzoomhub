@@ -6,12 +6,7 @@ const PrivateRoute = ({ history, ...rest }) => {
   const { currentUser } = useContext(AuthContext);
 
   if (!currentUser) {
-    console.log(history.getCurrentLocation().key);
-    if (history.getCurrentLocation().key === null) {
-      return <Redirect to="/" />;
-    } else {
-      history.goBack();
-    }
+    return <Redirect to="/" />;
   }
 
   return <Route {...rest} />;

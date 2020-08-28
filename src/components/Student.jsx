@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 
@@ -9,15 +9,13 @@ import "../styles/Home.css";
 
 const users = app.firestore().collection("users");
 
-const LinkInput = ({ netid, setAddingLink }) => {
+const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
   const [slugInput, setSlugInput] = useState("");
   const [nameInput, setNameInput] = useState("");
   const [linkInput, setLinkInput] = useState("");
-  const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
 
   const addLink = async (slug, name, url) => {
-    setError("");
     if (!slug) {
       setError("Missing slug name.");
       return;
@@ -34,6 +32,7 @@ const LinkInput = ({ netid, setAddingLink }) => {
         ? "http://" + url
         : url;
 
+    setError("");
     setPending(true);
     if (netid) {
       await users
@@ -43,6 +42,9 @@ const LinkInput = ({ netid, setAddingLink }) => {
         .set({
           name: name || slug,
           url: urlLink,
+        })
+        .then(() => {
+          setRefresh(true);
         })
         .catch((err) => {
           console.log(err);
@@ -73,13 +75,13 @@ const LinkInput = ({ netid, setAddingLink }) => {
   return (
     <form className="form justify-content-center" onSubmit={handleSubmit}>
       <label className="sr-only" htmlFor="slug-input">
-        Slug Name
+        Slug
       </label>
       <input
         type="text"
         className="form-control mb-2 mr-sm-2 center"
         id="slug-input"
-        placeholder="Slug Name"
+        placeholder="Slug"
         onChange={handleSlugChange}
         required
       />
@@ -90,7 +92,7 @@ const LinkInput = ({ netid, setAddingLink }) => {
         type="text"
         className="form-control mb-2 mr-sm-2 center"
         id="name-input"
-        placeholder={slugInput || "Nickname"}
+        placeholder={"Nickname" + (slugInput && ": " + slugInput)}
         onChange={handleNameChange}
       />
       <label className="sr-only" htmlFor="url-input">
@@ -108,25 +110,106 @@ const LinkInput = ({ netid, setAddingLink }) => {
         <p className="text-info">Adding link at /link/{slugInput}</p>
       ) : (
         <button type="submit" className="btn btn-outline-primary mb-2">
-          Add Link
+          Add link{slugInput && " at /link/" + slugInput}
         </button>
       )}
-      {error && <p className="text-danger">{error}</p>}
     </form>
   );
 };
+
+function ExistingLinks({ netid, refresh }) {
+  const [linkDocs, setLinkDocs] = useState([]);
+  const [links, setLinks] = useState([]);
+
+  const getLinks = () => {
+    users
+      .doc(netid)
+      .collection("links")
+      .where("url", ">", "")
+      .get()
+      .then((docs) => {
+        setLinkDocs(docs);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const formatLinks = () => {
+    const links = [];
+    linkDocs.forEach((linkDoc) => {
+      links.push({
+        id: linkDoc.id,
+        data: linkDoc.data(),
+      });
+    });
+    links.sort((a, b) => (a.id > b.id ? 1 : -1));
+    return links.map(({ id, data }) => {
+      if (id.match(/^[a-z0-9-+]+$/) && data && data.url) {
+        return (
+          <h2 key={id}>
+            <Link to={"/link/" + id}>
+              {id || data.name} ({data.url})
+            </Link>
+          </h2>
+        );
+      }
+    });
+  };
+
+  useEffect(() => {
+    getLinks();
+  }, [refresh]);
+
+  useEffect(() => {
+    setLinks(formatLinks());
+  }, [linkDocs]);
+
+  return <div className="existing-links">{links}</div>;
+}
 
 function Student() {
   const { netid } = useContext(AuthContext);
 
   const [addingLink, setAddingLink] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (refresh) {
+      setRefresh(false);
+    }
+  }, [refresh]);
+
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   return (
     <div className="home">
       <div className="container">
-        <h1>Signed In</h1>
-        {addingLink ? (
-          <LinkInput netid={netid} setAddingLink={setAddingLink} />
+        <h1>Signed in{netid && " as " + netid}</h1>
+        {!refresh && <ExistingLinks netid={netid} />}
+        {addingLink || error ? (
+          <LinkInput
+            netid={netid}
+            setAddingLink={setAddingLink}
+            setRefresh={setRefresh}
+            setError={(message) => {
+              if (message) {
+                setError("Error!");
+                setTimeout(() => {
+                  if (!mountedRef.current) return null;
+                  setError(message);
+                }, 500);
+              } else {
+                setError(message);
+              }
+            }}
+          />
         ) : (
           <button
             className="btn btn-info"
@@ -137,6 +220,7 @@ function Student() {
             Add Link
           </button>
         )}
+        {error && <p className="text-danger">{error}</p>}
       </div>
     </div>
   );
