@@ -4,3 +4,24 @@
 .student h2 {
   font-size: 1.4em;
 }
+.student .btn {
+  margin: 8px;
+}
+.student .add-link {
+  margin: 10px;
+}
+.student .existing-links a {
+  text-decoration: none;
+}
+.student .existing-links ul {
+  padding: 0;
+}
+.student .existing-links li {
+  list-style-type: none;
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 10px;
+}
+.student .existing-links li p {
+  margin: 0;
+}

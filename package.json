@@ -20,6 +20,7 @@
   },
   "scripts": {
     "deploy": "yarn build && firebase deploy --only hosting",
+    "rules": "firebase deploy --only firestore:rules",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

@@ -8,6 +8,7 @@ import { AuthContext } from "../util/auth";
 import app from "../util/base";
 
 import "../styles/Student.css";
+import x from "../assets/icons/x.svg";
 
 moment.tz.setDefault("America/New_York");
 const users = app.firestore().collection("users");
@@ -129,10 +130,20 @@ const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
           Setting redirect link to {urlLink} at /link/{slugInput}
         </p>
       ) : (
-        <button type="submit" className="btn btn-outline-primary mb-2">
-          Set redirect link{linkInput && " to " + linkInput}
-          {slugInput && " at /link/" + slugInput}
-        </button>
+        <>
+          <button
+            className="btn btn-outline-danger"
+            onClick={() => {
+              setAddingLink(false);
+            }}
+          >
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-outline-primary">
+            Set redirect link{linkInput && " to " + linkInput}
+            {slugInput && " at /link/" + slugInput}
+          </button>
+        </>
       )}
     </form>
   );
@@ -178,6 +189,17 @@ function ExistingLinks({ netid, refresh }) {
   }, [refresh, netid]);
 
   useEffect(() => {
+    const deleteLink = (id) => {
+      users
+        .doc(netid)
+        .collection("links")
+        .doc(id)
+        .delete()
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+
     const formatLinks = () => {
       const formattedLinks = [];
       linkDocs.forEach((linkDoc) => {
@@ -194,26 +216,33 @@ function ExistingLinks({ netid, refresh }) {
             /^(http:\/\/|https:\/\/)?(cornell\.zoom+\.us+\/j\/)([0-9]{9,11})(\?pwd=[a-zA-Z0-9]+)?$/
           );
           return (
-            <div key={id}>
-              <h2>
-                <Link to={"/link/" + id}>
-                  {name} {id !== name && `(/link/${id})`}
-                </Link>
-              </h2>
-              <p className={cornellZoomLink ? "text-success" : "text-info"}>
-                {url}
-              </p>
-            </div>
+            <Link key={id} to={"/link/" + id}>
+              <li className="bg-light">
+                <img
+                  src={x}
+                  width="22"
+                  alt="Delete link."
+                  className="float-right"
+                  onClick={() => deleteLink(id)}
+                />
+                <h2>
+                  {name} {id !== name && `(/${id})`}
+                </h2>
+                <p className={cornellZoomLink ? "text-success" : "text-info"}>
+                  {url}
+                </p>
+              </li>
+            </Link>
           );
         });
     };
     setLinks(formatLinks());
-  }, [linkDocs]);
+  }, [linkDocs, netid]);
 
   return (
     <div className="existing-links">
+      {links && <ul>{links}</ul>}
       <p>{!!links.length && "Last Updated: " + lastUpdated}</p>
-      {links}
     </div>
   );
 }
@@ -247,35 +276,37 @@ function Student() {
       </Helmet>
       <div className="container">
         <h1>Signed in{netid && " as " + netid}</h1>
-        {!refresh && <ExistingLinks netid={netid} />}
-        {addingLink || error ? (
-          <LinkInput
-            netid={netid}
-            setAddingLink={setAddingLink}
-            setRefresh={setRefresh}
-            setError={(message) => {
-              if (message) {
-                setError("Error!");
-                setTimeout(() => {
-                  if (!mountedRef.current) return null;
+        <div className="add-link">
+          {addingLink || error ? (
+            <LinkInput
+              netid={netid}
+              setAddingLink={setAddingLink}
+              setRefresh={setRefresh}
+              setError={(message) => {
+                if (message) {
+                  setError("Error!");
+                  setTimeout(() => {
+                    if (!mountedRef.current) return null;
+                    setError(message);
+                  }, 500);
+                } else {
                   setError(message);
-                }, 500);
-              } else {
-                setError(message);
-              }
-            }}
-          />
-        ) : (
-          <button
-            className="btn btn-info"
-            onClick={() => {
-              setAddingLink(true);
-            }}
-          >
-            Create/edit Link
-          </button>
-        )}
-        {error && <p className="text-danger">{error}</p>}
+                }
+              }}
+            />
+          ) : (
+            <button
+              className="btn btn-info"
+              onClick={() => {
+                setAddingLink(true);
+              }}
+            >
+              Create/edit Link
+            </button>
+          )}
+          {error && <p className="text-danger">{error}</p>}
+        </div>
+        {!refresh && <ExistingLinks netid={netid} />}
       </div>
     </div>
   );
