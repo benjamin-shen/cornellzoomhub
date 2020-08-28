@@ -14,23 +14,11 @@ const uiConfig = {
   ],
 };
 
-
 function Signin() {
-
   const { currentUser, isProf } = useContext(AuthContext);
 
-  if (isProf === undefined ) {
-    return <div> ...Authorizing </div>
-  }
-
   if (currentUser) {
-    if (isProf === true) {
-      return <Redirect to="/professor" />;
-    }
-    else if (isProf === false) {
-      return <Redirect to="/student" />;
-    }
-    // return isProf === true ? <Redirect to="/professor" /> : <Redirect to="/student" />; 
+    return isProf ? <Redirect to="/professor" /> : <Redirect to="/student" />;
   }
 
   return (

@@ -1,12 +1,15 @@
 import React, { createContext, useState, useEffect } from "react";
 import app from "./base";
 
+const users = app.firestore().collection("users");
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState();
   const [netid, setNetid] = useState();
   const [pending, setPending] = useState(true);
+
   const [isProf, setIsProf] = useState(null);
 
   useEffect(() => {
@@ -35,22 +38,31 @@ export const AuthProvider = ({ children }) => {
     if (currentUser) {
       const netidMatch = currentUser.email.match(/^([^@]*)@/);
       setNetid(netidMatch && netidMatch[1]);
-      console.log('requesting...')
-      const db = app.firestore();
-      const users = db.collection('users');
-      if (netid) {
-        const doc = users.doc(netid);
-        doc.get().then(data => {
-          console.log(data.data());
-          setIsProf(data.data().isProfessor);
-        })
-      }
     }
-  }, [currentUser, netid]);
+  }, [currentUser]);
 
+  useEffect(() => {
+    if (netid) {
+      users
+        .doc(netid)
+        .get()
+        .then((doc) => {
+          const data = doc.data();
+          if (data.isProfessor) {
+            setIsProf(true);
+          } else {
+            setIsProf(false);
+          }
+        });
+    }
+  }, [netid]);
 
   if (pending) {
     return <p className="message">Loading...</p>;
+  }
+
+  if (isProf == null) {
+    return <p className="message">Authorizing...</p>;
   }
 
   return (
