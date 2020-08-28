@@ -10,6 +10,7 @@
     "firebase-admin": "^9.1.1",
     "fs": "^0.0.1-security",
     "node-fetch": "^2.6.0",
+    "moment-timezone": "^0.5.31",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-firebaseui": "^4.1.0",
