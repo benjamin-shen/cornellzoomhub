@@ -12,11 +12,11 @@ function LinkRedirect({
     params: { slug },
   },
 }) {
-  const { currentUser, netid } = useContext(AuthContext);
+  const { netid } = useContext(AuthContext);
   const [invalid, setInvalid] = useState(false);
 
   useEffect(() => {
-    if (slug) {
+    if (slug && netid) {
       users
         .doc(netid)
         .collection("links")
@@ -38,7 +38,7 @@ function LinkRedirect({
           setInvalid(true);
         });
     }
-  }, [netid, slug]);
+  }, [slug, netid]);
 
   if (!slug || invalid) {
     return <Redirect to="/" />;
