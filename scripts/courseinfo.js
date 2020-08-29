@@ -47,23 +47,25 @@ const populateCourseInfo = async () => {
       fs.writeFileSync('./classes.json', JSON.stringify(fileData));
   })
 
-  // subjects.forEach(async sub => {
-  //   const collection = db.collection('courses');
-  //   const res = await fetch(`${base}/search/classes.json?roster=FA20&subject=${sub}`);
-  //   const courses = await res.json();
-  //   await courses.data.classes.forEach(async course => {
-  //     await course.enrollGroups[0].classSections.forEach(async section => {
-  //       const subDoc = collection.doc(sub);
-  //       const courseNumberCollection = subDoc.collection("" + course.catalogNbr + "");
-  //       const sectionDoc = courseNumberCollection.doc("" + section.classNbr + "");
-  //       await sectionDoc.set({
-  //         instructors: section.meetings.length > 0 ? section.meetings[0].instructors.map(ins => ins.firstName + " " + ins.middleName + " " + ins.lastName) : [], 
-  //         netids: section.meetings.length > 0 ? section.meetings[0].instructors.map(ins => ins.netid) : []
-  //       });
-  //       await sleep(1000);
-  //     })
-  //   })
-  // })
+  subjects.forEach(async sub => {
+    const collection = db.collection('courses');
+    const res = await fetch(`${base}/search/classes.json?roster=FA20&subject=${sub}`);
+    const courses = await res.json();
+    await courses.data.classes.forEach(async course => {
+      await course.enrollGroups[0].classSections.forEach(async section => {
+        const subDoc = collection.doc(sub);
+        await subDoc.set({});
+        const courseNumberCollection = subDoc.collection("" + course.catalogNbr + "");
+        await courseNumberCollection.doc('default').set({netids: [], link: ""})
+        const sectionDoc = courseNumberCollection.doc("" + section.classNbr + "");
+        await sectionDoc.set({
+          instructors: section.meetings.length > 0 ? section.meetings[0].instructors.map(ins => ins.firstName + " " + ins.middleName + " " + ins.lastName) : [], 
+          netids: section.meetings.length > 0 ? section.meetings[0].instructors.map(ins => ins.netid) : []
+        });
+        await sleep(1000);
+      })
+    })
+  })
   return fileData;
 }
 
