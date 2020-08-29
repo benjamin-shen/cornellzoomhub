@@ -7,6 +7,8 @@ import { AuthContext } from "../util/auth";
 import app from "../util/base";
 
 import "../styles/Professor.css";
+import { link } from "fs";
+import { get } from "http";
 
 const professors = app.firestore().collection("professors");
 const courses = app.firestore().collection("courses");
@@ -22,6 +24,7 @@ function ClassCard({ subject, number }) {
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [urlLink, setUrlLink] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setUrlLink(
@@ -33,6 +36,25 @@ function ClassCard({ subject, number }) {
     );
   }, [linkInput]);
 
+  useEffect(() => {
+
+    if (loading) {
+      const prePopulate = async () => {
+        await courses
+        .doc(subject)
+        .collection(number + "")
+        .doc("default")
+        .get()
+        .then(res => {
+          const data = res.data();
+          setLinkInput(data.link);
+          setWhitelistString(data.netids.join('\n'));
+        })
+      }
+      prePopulate();
+      setLoading(false);
+    }
+  }, [loading, number, subject])
   const handleLinkChange = (event) => {
     setLinkInput(event.target.value);
   };
@@ -43,6 +65,7 @@ function ClassCard({ subject, number }) {
     event.preventDefault();
     await addLink(linkInput);
     await addWhitelist(whitelistString);
+    setModal(false);
   };
 
   const addLink = async (url) => {
@@ -106,6 +129,7 @@ function ClassCard({ subject, number }) {
             <input
               type="text"
               className="form-control mb-2 mr-sm-2 center"
+              value={linkInput}
               id="url-input"
               placeholder="URL Link"
               onChange={handleLinkChange}
@@ -114,9 +138,12 @@ function ClassCard({ subject, number }) {
             <br />
             <h5> Whitelist of NetIDs (newline separated) </h5>
             <textarea
+              value={whitelistString}
               className="form-control mb-2 mr-sm-10 center"
               onChange={handleWhitelistChange}
             />
+            {error && <p className="text-danger">{error}</p>}
+            {pending && (<div> Link updating... <br /> </div>)}
             <button type="submit" className="btn btn-outline-primary">
               Set redirect link
             </button>
@@ -151,7 +178,6 @@ function Professor() {
           .collection("courses")
           .get()
           .then((docs) => {
-            console.log(docs);
             setCourseDocs(docs);
           })
           .catch((err) => {

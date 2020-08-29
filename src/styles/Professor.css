@@ -33,7 +33,7 @@
   margin: 0;
 }
 
-.professor textarea {
+.form textarea {
   height: 20vh !important;
   resize: none;
 }
