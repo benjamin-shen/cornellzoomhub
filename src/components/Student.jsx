@@ -35,7 +35,10 @@ const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
       setError("Missing slug name.");
       return;
     } else if (!slug.match(/^[a-z0-9-+]+$/)) {
-      setError("Slug does not match regex.");
+      setError(
+        "Slug does not match regex." + slug.contains(" ") &&
+          " Spaces are not allowed."
+      );
       return;
     }
     if (!url) {
@@ -176,9 +179,7 @@ function ExistingLinks({ netid, refresh }) {
           if (doc.exists) {
             const { lastUpdated } = doc.data();
             if (lastUpdated) {
-              setLastUpdated(
-                moment(lastUpdated.toDate()).format("LLLL")
-              );
+              setLastUpdated(moment(lastUpdated.toDate()).format("LLLL"));
             }
           }
         })
@@ -306,7 +307,8 @@ function Student() {
               Create/edit Link
             </button>
           )}
-          <button 
+          {error && <p className="text-danger">{error}</p>}
+          <button
             className="btn btn-danger"
             onClick={() => {
               app.auth().signOut();
@@ -315,7 +317,6 @@ function Student() {
           >
             Sign Out
           </button>
-          {error && <p className="text-danger">{error}</p>}
         </div>
         {!refresh && <ExistingLinks netid={netid} />}
       </div>

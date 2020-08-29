@@ -1,2 +1,8 @@
 .signin {
+  height: 100vh;
+  display: grid;
+  place-items: center;
+}
+.signin p {
+  margin: 5px;
 }

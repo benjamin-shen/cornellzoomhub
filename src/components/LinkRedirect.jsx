@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
-import { Redirect } from "react-router-dom";
+import { Redirect, withRouter } from "react-router-dom";
 
 import { AuthContext } from "../util/auth";
 import app from "../util/base";
@@ -11,6 +11,7 @@ function LinkRedirect({
   match: {
     params: { slug },
   },
+  history,
 }) {
   const { netid } = useContext(AuthContext);
   const [invalid, setInvalid] = useState(false);
@@ -27,7 +28,7 @@ function LinkRedirect({
             const url = doc.data().url;
             if (url) {
               setInvalid(false);
-              window.location = url;
+              window.location.href = url;
               return;
             }
           }
@@ -59,4 +60,4 @@ function LinkRedirect({
   );
 }
 
-export default LinkRedirect;
+export default withRouter(LinkRedirect);

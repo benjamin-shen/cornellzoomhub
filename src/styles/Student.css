@@ -19,9 +19,10 @@
 .student .existing-links li {
   list-style-type: none;
   padding: 10px 20px;
-  margin: 10px;
+  margin: 10px auto;
   border-radius: 10px;
   position: relative;
+  max-width: 50%;
 }
 .student .existing-links li p {
   margin: 0;
@@ -35,4 +36,20 @@
 }
 .student .existing-links .delete-link:hover {
   transform: scale(1.3);
+}
+
+@media (max-width: 1000px) {
+  .student .existing-links li {
+    max-width: 70%;
+  }
+}
+@media (max-width: 700px) {
+  .student .existing-links li {
+    max-width: 85%;
+  }
+}
+@media (max-width: 500px) {
+  .student .existing-links li {
+    max-width: 100%;
+  }
 }

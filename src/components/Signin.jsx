@@ -23,7 +23,32 @@ function Signin() {
 
   return (
     <div className="signin">
-      <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={app.auth()} />
+      <div>
+        <h1>
+          <span className="cornell">Cornell</span> Zoom Hub
+        </h1>
+        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={app.auth()} />
+        <p>
+          Design:{" "}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.figma.com/file/Nt1zPEaONh4Bl8qlQ1TQ6Y/Cornell-Zoom-Hub"
+          >
+            Figma
+          </a>
+        </p>
+        <p>
+          Code:{" "}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/benjamin-shen/cornellzoomhub"
+          >
+            Github
+          </a>
+        </p>
+      </div>
     </div>
   );
 }
