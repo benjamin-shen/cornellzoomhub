@@ -11,5 +11,8 @@ service cloud.firestore {
     match /users/{netid}/{links=**} {
       allow read, write: if validEmail() && netid + "@cornell.edu" == request.auth.token.email;
     }
+    match /professors/{professor=**} {
+      allow read: if validEmail();
+    }
   }
 }

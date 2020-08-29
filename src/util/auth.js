@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import app from "./base";
 
-const users = app.firestore().collection("users");
+const professors = app.firestore().collection("professors");
 
 export const AuthContext = createContext();
 
@@ -42,32 +42,13 @@ export const AuthProvider = ({ children }) => {
   }, [currentUser]);
 
   useEffect(() => {
-    const getUserData = async () => {
-      const setProfessor = (doc) => {
-        const data = doc.data();
-        setIsProf(!!data.isProfessor);
-      };
-      users
+    if (netid) {
+      professors
         .doc(netid)
         .get()
-        .then(async (doc) => {
-          if (doc.exists) {
-            setProfessor(doc);
-          } else {
-            await users.doc(netid).set({
-              lastUpdated: new Date(),
-            });
-            users
-              .doc(netid)
-              .get()
-              .then((doc) => {
-                setProfessor(doc);
-              });
-          }
+        .then((doc) => {
+          setIsProf(doc.exists);
         });
-    };
-    if (netid) {
-      getUserData();
     }
   }, [netid]);
 

@@ -307,7 +307,7 @@ function Student() {
             </button>
           )}
           <button 
-            className="btn btn-info"
+            className="btn btn-danger"
             onClick={() => {
               app.auth().signOut();
               document.location.href = "/";
