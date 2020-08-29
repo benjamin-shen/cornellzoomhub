@@ -25,6 +25,12 @@ function ClassCard({ subject, number }) {
   const [backgroundUrlLink, setBackgroundUrlLink] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const generateUrl = (course) => {
+    const href = window.location.href;
+    const root = href.substring(0, href.lastIndexOf("/"));
+    return root + "/courses/" + course;
+  };
+
   useEffect(() => {
     setUrlLink(
       linkInput &&
@@ -163,6 +169,7 @@ function ClassCard({ subject, number }) {
       >
         <li className="bg-light">
           <h2>{course}</h2>
+          {urlLink !== "" && <p className="text-dark"> {generateUrl(course)} </p>}
           {<p className={cornellZoomLink ? "text-success" : "text-info"}>
             {backgroundUrlLink}
           </p>}
