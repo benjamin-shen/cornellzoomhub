@@ -11,8 +11,6 @@ function ClassCard(props) {
 
   const { netid } = useContext(AuthContext);
   const [modal, setModal] = useState(false);
-  const [slugInput, setSlugInput] = useState("");
-  const [nameInput, setNameInput] = useState("");
   const [linkInput, setLinkInput] = useState("");
   const [whitelistString, setWhitelistString] = useState("");
   const [error, setError] = useState("");
@@ -29,12 +27,6 @@ function ClassCard(props) {
     );
   }, [linkInput]);
 
-  const handleSlugChange = (event) => {
-    setSlugInput(event.target.value);
-  };
-  const handleNameChange = (event) => {
-    setNameInput(event.target.value);
-  };
   const handleLinkChange = (event) => {
     setLinkInput(event.target.value);
   };
@@ -43,23 +35,13 @@ function ClassCard(props) {
   }
   const handleSubmit = async (event) => {
     event.preventDefault();
-    await addLink(slugInput, nameInput, linkInput);
+    await addLink(linkInput);
     await addWhitelist(whitelistString);
   }
 
-  const addLink = async (slug, name, url) => {
+  const addLink = async (url) => {
     const courses = app.firestore().collection('courses');
 
-    if (!slug) {
-      setError("Missing slug name.");
-      return;
-    } else if (!slug.match(/^[a-z0-9-+]+$/)) {
-      setError(
-        "Slug does not match regex." + slug.contains(" ") &&
-          " Spaces are not allowed."
-      );
-      return;
-    }
     if (!url) {
       setError("Missing url link.");
       return;
@@ -120,21 +102,6 @@ function ClassCard(props) {
             <input
               type="text"
               className="form-control mb-2 mr-sm-2 center"
-              id="slug-input"
-              placeholder="Slug"
-              onChange={handleSlugChange}
-              required
-            />
-            <input
-              type="text"
-              className="form-control mb-2 mr-sm-2 center"
-              id="name-input"
-              placeholder={"Nickname" + (slugInput && ": " + slugInput)}
-              onChange={handleNameChange}
-            />
-            <input
-              type="text"
-              className="form-control mb-2 mr-sm-2 center"
               id="url-input"
               placeholder="URL Link"
               onChange={handleLinkChange}
@@ -147,8 +114,7 @@ function ClassCard(props) {
               onChange={handleWhitelistChange}
             />
             <button type="submit" className="btn btn-outline-primary">
-              Set redirect link{linkInput && " to " + linkInput}
-              {slugInput && " at /link/" + slugInput}
+              Set redirect link
             </button>
           </form> 
         </Modal.Body>
