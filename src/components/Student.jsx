@@ -174,7 +174,6 @@ function ExistingLinks({ netid, refresh }) {
         .get()
         .then((doc) => {
           if (doc.exists) {
-            // TODO moment formatting
             setLastUpdated(
               moment(doc.data().lastUpdated.toDate()).format("LLLL")
             );
@@ -242,7 +241,7 @@ function ExistingLinks({ netid, refresh }) {
   return (
     <div className="existing-links">
       {links && <ul>{links}</ul>}
-      <p>{!!links.length && "Last Updated: " + lastUpdated}</p>
+      <p>{!!links.length && lastUpdated && "Last Updated: " + lastUpdated}</p>
     </div>
   );
 }

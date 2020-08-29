@@ -42,18 +42,36 @@ export const AuthProvider = ({ children }) => {
   }, [currentUser]);
 
   useEffect(() => {
-    if (netid) {
+    const getUserData = async () => {
+      const setProfessor = (doc) => {
+        const data = doc.data();
+        if (data.isProfessor) {
+          setIsProf(true);
+        } else {
+          setIsProf(false);
+        }
+      };
       users
         .doc(netid)
         .get()
-        .then((doc) => {
-          const data = doc.data();
-          if (data.isProfessor) {
-            setIsProf(true);
+        .then(async (doc) => {
+          if (doc.exists) {
+            setProfessor(doc);
           } else {
-            setIsProf(false);
+            await users.doc(netid).set({
+              lastUpdated: new Date(),
+            });
+            users
+              .doc(netid)
+              .get()
+              .then((doc) => {
+                setProfessor(doc);
+              });
           }
         });
+    };
+    if (netid) {
+      getUserData();
     }
   }, [netid]);
 
