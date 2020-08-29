@@ -31,23 +31,36 @@ function Signin() {
           <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={app.auth()} />
         </div>
         <p>
-          Design:{" "}
           <a
             target="_blank"
             rel="noopener noreferrer"
             href="https://www.figma.com/file/Nt1zPEaONh4Bl8qlQ1TQ6Y/Cornell-Zoom-Hub"
           >
             Figma
-          </a>
-        </p>
-        <p>
-          Code:{" "}
+          </a>{" "}
+          |{" "}
           <a
             target="_blank"
             rel="noopener noreferrer"
             href="https://github.com/benjamin-shen/cornellzoomhub"
           >
             Github
+          </a>{" "}
+          |{" "}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.youtube.com/watch?v=D_3ykpsz8uU"
+          >
+            Youtube
+          </a>{" "}
+          |{" "}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://docs.google.com/presentation/d/1eJWXWccfQ4rJPiv2TtPnyItSNDnVND_jlc3S-fUi6dc/edit?usp=sharing"
+          >
+            Presentation
           </a>
         </p>
       </div>
