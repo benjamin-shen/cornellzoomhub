@@ -12,9 +12,8 @@ import PrivateRoute from "./util/PrivateRoute";
 import Signin from "./components/Signin";
 import Student from "./components/Student";
 import Professor from "./components/Professor";
-// professor
 import LinkRedirect from "./components/LinkRedirect";
-// join/uid
+import CourseLinkRedirect from "./components/CourseLinkRedirect";
 import "./styles/App.css";
 
 const PageNotFound = () => {
@@ -44,6 +43,11 @@ function App() {
             />
             <PrivateRoute exact path="/student" component={Student} />
             <PrivateRoute exact path="/link/:slug" component={LinkRedirect} />
+            <PrivateRoute
+              exact
+              path="/courses/:course"
+              component={CourseLinkRedirect}
+            />
             <Route component={PageNotFound} />
           </Switch>
         </Router>

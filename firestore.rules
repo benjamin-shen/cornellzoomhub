@@ -6,7 +6,7 @@ service cloud.firestore {
     }
 
     match /courses/{course=**} {
-      allow read: if validEmail();
+      allow read, write: if validEmail();
     }
     match /users/{netid}/{links=**} {
       allow read, write: if validEmail() && netid + "@cornell.edu" == request.auth.token.email;

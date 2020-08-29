@@ -188,6 +188,11 @@ export function CourseLinks({ netid }) {
             console.log(err);
           });
       }
+      const generateUrl = (course) => {
+        const href = window.location.href;
+        const root = href.substring(0, href.lastIndexOf("/"));
+        return root + "/courses/" + course;
+      };
       return result
         .filter(({ course, url }) => course && url)
         .map(({ course, url }) => {
@@ -205,6 +210,7 @@ export function CourseLinks({ netid }) {
                   onClick={() => deleteCourse(course)}
                 />
                 <h2>{course}</h2>
+                {course && <p className="text-dark">{generateUrl(course)}</p>}
                 <p className={cornellZoomLink ? "text-success" : "text-info"}>
                   {url}
                 </p>

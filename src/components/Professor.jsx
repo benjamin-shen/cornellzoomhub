@@ -12,7 +12,7 @@ const professors = app.firestore().collection("professors");
 const courses = app.firestore().collection("courses");
 
 function ClassCard({ subject, number }) {
-  const course = subject + " " + number;
+  const course = subject + number;
 
   const { netid } = useContext(AuthContext);
 

@@ -220,6 +220,11 @@ export function ExistingLinks({ netid }) {
         });
       });
       result.sort((a, b) => (a.data.name > b.data.name ? 1 : -1));
+      const generateUrl = (slug) => {
+        const href = window.location.href;
+        const root = href.substring(0, href.lastIndexOf("/"));
+        return root + "/link/" + slug;
+      };
       return result
         .filter(({ id, data }) => id.match(/^[a-z0-9-+]+$/) && data && data.url)
         .map(({ id, data: { name, url } }) => {
@@ -236,9 +241,8 @@ export function ExistingLinks({ netid }) {
                   className="delete-x"
                   onClick={() => deleteLink(id)}
                 />
-                <h2>
-                  {name} {id !== name && `(/${id})`}
-                </h2>
+                <h2>{name}</h2>
+                {id && <p className="text-dark">{generateUrl(id)}</p>}
                 <p className={cornellZoomLink ? "text-success" : "text-info"}>
                   {url}
                 </p>
