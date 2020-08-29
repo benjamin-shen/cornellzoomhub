@@ -198,6 +198,16 @@ function ExistingLinks({ netid, refresh }) {
         .collection("links")
         .doc(id)
         .delete()
+        .then(async () => {
+          await users
+            .doc(netid)
+            .set({
+              lastUpdated: new Date(),
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        })
         .catch((err) => {
           console.log(err);
         });
