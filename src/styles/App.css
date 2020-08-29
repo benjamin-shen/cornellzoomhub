@@ -10,3 +10,13 @@
 .cornell {
   color: #fc0000;
 }
+.delete-x {
+  margin: 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  transition: all 0.1s;
+}
+.delete-x:hover {
+  transform: scale(1.3);
+}

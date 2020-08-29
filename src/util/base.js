@@ -21,5 +21,6 @@ const app = firebase.initializeApp(config);
 export const GoogleAuthProvider = firebase.auth.GoogleAuthProvider.PROVIDER_ID;
 
 export const arrayUnion = firebase.firestore.FieldValue.arrayUnion;
+export const arrayRemove = firebase.firestore.FieldValue.arrayRemove;
 
 export default app;

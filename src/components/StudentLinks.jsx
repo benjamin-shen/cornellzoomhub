@@ -140,6 +140,7 @@ export const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
           <button
             className="btn btn-outline-danger"
             onClick={() => {
+              setError("");
               setAddingLink(false);
             }}
           >
@@ -151,7 +152,7 @@ export const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
   );
 };
 
-export function ExistingLinks({ netid, refresh }) {
+export function ExistingLinks({ netid }) {
   const [linkDocs, setLinkDocs] = useState([]);
   const [links, setLinks] = useState([]);
   const [lastUpdated, setLastUpdated] = useState("");
@@ -186,7 +187,7 @@ export function ExistingLinks({ netid, refresh }) {
     };
     getLinks();
     getLastUpdated();
-  }, [refresh, netid]);
+  }, [netid]);
 
   useEffect(() => {
     const deleteLink = (id) => {
@@ -211,15 +212,15 @@ export function ExistingLinks({ netid, refresh }) {
     };
 
     const formatLinks = () => {
-      const formattedLinks = [];
+      const result = [];
       linkDocs.forEach((linkDoc) => {
-        formattedLinks.push({
+        result.push({
           id: linkDoc.id,
           data: linkDoc.data(),
         });
       });
-      formattedLinks.sort((a, b) => (a.data.name > b.data.name ? 1 : -1));
-      return formattedLinks
+      result.sort((a, b) => (a.data.name > b.data.name ? 1 : -1));
+      return result
         .filter(({ id, data }) => id.match(/^[a-z0-9-+]+$/) && data && data.url)
         .map(({ id, data: { name, url } }) => {
           const cornellZoomLink = url.match(
@@ -232,7 +233,7 @@ export function ExistingLinks({ netid, refresh }) {
                   src={x}
                   width="22"
                   alt="Delete link."
-                  className="delete-link"
+                  className="delete-x"
                   onClick={() => deleteLink(id)}
                 />
                 <h2>
@@ -250,7 +251,7 @@ export function ExistingLinks({ netid, refresh }) {
   }, [linkDocs, netid]);
 
   return (
-    <div className="existing-links">
+    <div className="personal-links">
       {!!links.length && <ul>{links}</ul>}
       {!!links.length && lastUpdated && <p>{"Last Updated: " + lastUpdated}</p>}
     </div>

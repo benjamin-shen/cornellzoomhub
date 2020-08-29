@@ -5,8 +5,109 @@ import { AuthContext } from "../util/auth";
 import app from "../util/base";
 
 import { LinkInput, ExistingLinks } from "./StudentLinks";
-import { CourseInput, CourseLinks } from "./StudentCourses";
+import { CourseInput } from "./StudentCourses";
 import "../styles/Student.css";
+
+import { Link } from "react-router-dom";
+import { arrayRemove } from "../util/base";
+import x from "../assets/icons/x.svg";
+const users = app.firestore().collection("users");
+const courses = app.firestore().collection("courses");
+
+function CourseLinks({ netid }) {
+  const [coursesArray, setCoursesArray] = useState([]);
+  const [links, setLinks] = useState([]);
+
+  useEffect(() => {
+    const getLinks = () => {
+      users
+        .doc(netid)
+        .get()
+        .then((doc) => {
+          const data = doc.data();
+          if (data && data.courses) {
+            setCoursesArray(data.courses);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+    getLinks();
+  }, [netid]);
+
+  useEffect(() => {
+    const deleteCourse = (course) => {
+      users
+        .doc(netid)
+        .update({ courses: arrayRemove(course) })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+
+    const formatLinks = async () => {
+      const result = [];
+      coursesArray.sort();
+      for (const course of coursesArray) {
+        const [subject, number] = course
+          .toUpperCase()
+          .replace(/\s+/g, "")
+          .split(/([0-9]+)/);
+        await courses
+          .doc(subject)
+          .collection(number)
+          .doc("default")
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              const { link, netids } = doc.data();
+              if (link && netids && netids.length && netids.includes(netid)) {
+                result.push({
+                  course,
+                  url: link,
+                });
+              }
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+      return result
+        .filter(({ course, url }) => course && url)
+        .map(({ course, url }) => {
+          const cornellZoomLink = url.match(
+            /^(http:\/\/|https:\/\/)?(cornell\.zoom+\.us+\/j\/)([0-9]{9,11})(\?pwd=[a-zA-Z0-9]+)?$/
+          );
+          return (
+            <Link key={course} to={"/courses/" + course}>
+              <li className="bg-light">
+                <img
+                  src={x}
+                  width="22"
+                  alt="Delete course."
+                  className="delete-x"
+                  onClick={() => deleteCourse(course)}
+                />
+                <h2>{course}</h2>
+                <p className={cornellZoomLink ? "text-success" : "text-info"}>
+                  {url}
+                </p>
+              </li>
+            </Link>
+          );
+        });
+    };
+    formatLinks().then((res) => {
+      setLinks(res);
+    });
+  }, [coursesArray, netid]);
+
+  return (
+    <div className="course-links">{!!links.length && <ul>{links}</ul>}</div>
+  );
+}
 
 function Student() {
   const { netid } = useContext(AuthContext);
@@ -83,41 +184,44 @@ function Student() {
                 setAddingLink(true);
               }}
             >
-              Create/edit Link
+              Create/Edit Personal Link
             </button>
           )}
           {linkError && <p className="text-danger">{linkError}</p>}
         </div>
         {!refreshLinks && <ExistingLinks netid={netid} />}
         <hr />
-        {addingCourse || courseError ? (
-          <CourseInput
-            netid={netid}
-            setAddingCourse={setAddingCourse}
-            setRefresh={setRefreshCourses}
-            setError={(message) => {
-              if (message) {
-                setCourseError("Error!");
-                setTimeout(() => {
-                  if (!mountedRef.current) return null;
+        <div className="add-course">
+          {addingCourse || courseError ? (
+            <CourseInput
+              netid={netid}
+              setAddingCourse={setAddingCourse}
+              setRefresh={setRefreshCourses}
+              setError={(message) => {
+                if (message) {
+                  setCourseError("Error!");
+                  setTimeout(() => {
+                    if (!mountedRef.current) return null;
+                    setCourseError(message);
+                  }, 500);
+                } else {
                   setCourseError(message);
-                }, 500);
-              } else {
-                setCourseError(message);
-              }
-            }}
-          />
-        ) : (
-          <button
-            className="btn btn-info"
-            onClick={() => {
-              setAddingCourse(true);
-            }}
-          >
-            Add Course Link
-          </button>
-        )}
-        {courseError && <p className="text-danger">{courseError}</p>}
+                }
+              }}
+            />
+          ) : (
+            <button
+              className="btn btn-info"
+              onClick={() => {
+                setAddingCourse(true);
+              }}
+            >
+              Add Course Link
+            </button>
+          )}
+          {courseError && <p className="text-danger">{courseError}</p>}
+        </div>
+        {!refreshCourses && <CourseLinks netid={netid} />}
       </div>
     </div>
   );

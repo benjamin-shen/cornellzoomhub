@@ -8,30 +8,20 @@
 .student .btn {
   margin: 8px;
 }
-.student .existing-links a {
+.student a {
   text-decoration: none;
   width: 50%;
 }
-.student .existing-links ul {
+.student ul {
   padding: 0;
 }
-.student .existing-links li {
+.student li {
   list-style-type: none;
   padding: 10px 20px;
   margin: 10px auto;
   border-radius: 10px;
   position: relative;
 }
-.student .existing-links li p {
+.student li p {
   margin: 0;
-}
-.student .existing-links .delete-link {
-  margin: 10px;
-  position: absolute;
-  top: 0;
-  right: 0;
-  transition: all 0.1s;
-}
-.student .existing-links .delete-link:hover {
-  transform: scale(1.3);
 }

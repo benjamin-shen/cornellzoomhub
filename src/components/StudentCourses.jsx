@@ -40,15 +40,16 @@ export function CourseInput({ netid, setAddingCourse, setRefresh, setError }) {
 
     setPending(true);
     // TODO non-default sections
-    const course = courses.doc(subject).collection(number).doc("default");
-    await course
+    await courses
+      .doc(subject)
+      .collection(number)
+      .doc("default")
       .get()
       .then(async (doc) => {
         if (doc.exists) {
           const { link, netids } = doc.data();
-          if (link && netids.length) {
+          if (link && netids && netids.length) {
             if (netids.includes(netid)) {
-              console.log(link);
               await users.doc(netid).update({
                 courses: arrayUnion(courseSubject + courseNumber),
               });
@@ -58,7 +59,7 @@ export function CourseInput({ netid, setAddingCourse, setRefresh, setError }) {
               setError("This professor has not whitelisted your netid.");
               return;
             }
-          } else if (netids.length) {
+          } else if (netids && netids.length) {
             setError("This professor has not assigned this course a link.");
             return;
           } else {
@@ -112,7 +113,10 @@ export function CourseInput({ netid, setAddingCourse, setRefresh, setError }) {
           </button>
           <button
             className="btn btn-outline-danger"
-            onClick={() => setAddingCourse(false)}
+            onClick={() => {
+              setError("");
+              setAddingCourse(false);
+            }}
           >
             Cancel
           </button>
@@ -122,4 +126,4 @@ export function CourseInput({ netid, setAddingCourse, setRefresh, setError }) {
   );
 }
 
-function CourseLinks() {}
+export function CourseLinks() {}
