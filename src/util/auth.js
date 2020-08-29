@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import app from "./base";
 
+const users = app.firestore().collection("users");
 const professors = app.firestore().collection("professors");
 
 export const AuthContext = createContext();
@@ -51,6 +52,29 @@ export const AuthProvider = ({ children }) => {
         });
     }
   }, [netid]);
+
+  useEffect(() => {
+    if (currentUser && netid) {
+      users
+        .doc(netid)
+        .get()
+        .then((doc) => {
+          if (!doc.exists) {
+            users
+              .doc(netid)
+              .set({
+                lastUpdated: new Date(),
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [currentUser, netid]);
 
   if (pending) {
     return <p className="message">Loading...</p>;
