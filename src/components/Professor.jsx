@@ -7,8 +7,6 @@ import { AuthContext } from "../util/auth";
 import app from "../util/base";
 
 import "../styles/Professor.css";
-import { link } from "fs";
-import { get } from "http";
 
 const professors = app.firestore().collection("professors");
 const courses = app.firestore().collection("courses");
@@ -24,6 +22,7 @@ function ClassCard({ subject, number }) {
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [urlLink, setUrlLink] = useState("");
+  const [backgroundUrlLink, setBackgroundUrlLink] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,6 +47,7 @@ function ClassCard({ subject, number }) {
         .then(res => {
           const data = res.data();
           setLinkInput(data.link);
+          setBackgroundUrlLink(data.link);
           setWhitelistString(data.netids.join('\n'));
         })
       }
@@ -66,7 +66,8 @@ function ClassCard({ subject, number }) {
     await addLink(linkInput);
     await addWhitelist(whitelistString);
     setModal(false);
-  };
+    setBackgroundUrlLink(urlLink);
+  }
 
   const addLink = async (url) => {
     if (!url) {
@@ -111,6 +112,10 @@ function ClassCard({ subject, number }) {
         });
     }
   };
+
+  const cornellZoomLink = urlLink.match(
+    /^(http:\/\/|https:\/\/)?(cornell\.zoom+\.us+\/j\/)([0-9]{9,11})(\?pwd=[a-zA-Z0-9]+)?$/
+  );
 
   return (
     <>
@@ -158,6 +163,9 @@ function ClassCard({ subject, number }) {
       >
         <li className="bg-light">
           <h2>{course}</h2>
+          {<p className={cornellZoomLink ? "text-success" : "text-info"}>
+            {backgroundUrlLink}
+          </p>}
           {/* // TODO add link as in student page */}
         </li>
       </Link>
