@@ -174,9 +174,12 @@ function ExistingLinks({ netid, refresh }) {
         .get()
         .then((doc) => {
           if (doc.exists) {
-            setLastUpdated(
-              moment(doc.data().lastUpdated.toDate()).format("LLLL")
-            );
+            const { lastUpdated } = doc.data();
+            if (lastUpdated) {
+              setLastUpdated(
+                moment(lastUpdated.toDate()).format("LLLL")
+              );
+            }
           }
         })
         .catch((err) => {
@@ -303,6 +306,15 @@ function Student() {
               Create/edit Link
             </button>
           )}
+          <button 
+            className="btn btn-info"
+            onClick={() => {
+              app.auth().signOut();
+              document.location.href = "/";
+            }}
+          >
+            Sign Out
+          </button>
           {error && <p className="text-danger">{error}</p>}
         </div>
         {!refresh && <ExistingLinks netid={netid} />}

@@ -45,11 +45,7 @@ export const AuthProvider = ({ children }) => {
     const getUserData = async () => {
       const setProfessor = (doc) => {
         const data = doc.data();
-        if (data.isProfessor) {
-          setIsProf(true);
-        } else {
-          setIsProf(false);
-        }
+        setIsProf(!!data.isProfessor);
       };
       users
         .doc(netid)
@@ -79,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     return <p className="message">Loading...</p>;
   }
 
-  if (isProf == null) {
+  if (currentUser && isProf == null) {
     return <p className="message">Authorizing...</p>;
   }
 
