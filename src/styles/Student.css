@@ -1,5 +1,5 @@
 .student h1 {
-  margin-top: 20px;
+  padding-top: 20px;
   margin-bottom: 0;
 }
 .student h2 {
@@ -10,7 +10,6 @@
 }
 .student a {
   text-decoration: none;
-  width: 50%;
 }
 .student ul {
   padding: 0;

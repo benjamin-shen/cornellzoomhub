@@ -1,15 +1,21 @@
 import React, { useContext, useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
-import '../styles/Professor.css';
-import { AuthContext } from "../util/auth";
-import app from "../util/base";
 import Modal from "react-bootstrap/Modal";
 
-const professors = app.firestore().collection('professors');
+import { AuthContext } from "../util/auth";
+import app from "../util/base";
 
-function ClassCard(props) {
+import "../styles/Professor.css";
+
+const professors = app.firestore().collection("professors");
+const courses = app.firestore().collection("courses");
+
+function ClassCard({ subject, number }) {
+  const course = subject + " " + number;
 
   const { netid } = useContext(AuthContext);
+
   const [modal, setModal] = useState(false);
   const [linkInput, setLinkInput] = useState("");
   const [whitelistString, setWhitelistString] = useState("");
@@ -32,16 +38,14 @@ function ClassCard(props) {
   };
   const handleWhitelistChange = (event) => {
     setWhitelistString(event.target.value);
-  }
+  };
   const handleSubmit = async (event) => {
     event.preventDefault();
     await addLink(linkInput);
     await addWhitelist(whitelistString);
-  }
+  };
 
   const addLink = async (url) => {
-    const courses = app.firestore().collection('courses');
-
     if (!url) {
       setError("Missing url link.");
       return;
@@ -51,9 +55,9 @@ function ClassCard(props) {
     setPending(true);
     if (netid) {
       await courses
-        .doc(props.subject)
-        .collection(props.number + "")
-        .doc('default')
+        .doc(subject)
+        .collection(number + "")
+        .doc("default")
         .update({
           link: urlLink,
         })
@@ -68,13 +72,13 @@ function ClassCard(props) {
   };
 
   const addWhitelist = async (whitelist) => {
-    const courses = app.firestore().collection('courses');
+    const courses = app.firestore().collection("courses");
     const split = whitelist.split("\n");
     if (netid) {
       await courses
-        .doc(props.subject)
-        .collection(props.number + "")
-        .doc('default')
+        .doc(subject)
+        .collection(number + "")
+        .doc("default")
         .update({
           netids: split,
         })
@@ -83,19 +87,19 @@ function ClassCard(props) {
           setError("There was an error adding the whitelist.");
         });
     }
-  }
+  };
 
   return (
     <>
-      <Modal show={modal} onHide={() => setModal(false)}       
+      <Modal
+        show={modal}
+        onHide={() => setModal(false)}
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
       >
         <Modal.Header closeButton>
-          <h2> 
-            Zoom link settings for {props.subject + props.number}
-          </h2>
+          <h3>Zoom link settings for {course}</h3>
         </Modal.Header>
         <Modal.Body>
           <form className="form justify-content-center" onSubmit={handleSubmit}>
@@ -107,8 +111,8 @@ function ClassCard(props) {
               onChange={handleLinkChange}
               required
             />
-            <br /> 
-            <h5> Whitelist of NetIDs (newline separated) </h5>    
+            <br />
+            <h5> Whitelist of NetIDs (newline separated) </h5>
             <textarea
               className="form-control mb-2 mr-sm-10 center"
               onChange={handleWhitelistChange}
@@ -116,18 +120,18 @@ function ClassCard(props) {
             <button type="submit" className="btn btn-outline-primary">
               Set redirect link
             </button>
-          </form> 
+          </form>
         </Modal.Body>
       </Modal>
-      <Link key={props.subject + props.number}
+      <Link
+        key={course}
         onClick={(e) => {
           setModal(true);
         }}
       >
         <li className="bg-light">
-          <h2>
-            {props.subject + props.number}
-          </h2>
+          <h2>{course}</h2>
+          {/* // TODO add link as in student page */}
         </li>
       </Link>
     </>
@@ -135,11 +139,9 @@ function ClassCard(props) {
 }
 
 function Professor() {
-
   const { netid } = useContext(AuthContext);
   const [courseDocs, setCourseDocs] = useState([]);
   const [refresh, setRefresh] = useState(true);
-
 
   useEffect(() => {
     const getCourses = () => {
@@ -159,27 +161,32 @@ function Professor() {
       setRefresh(false);
     };
     getCourses();
-  }, [netid, refresh])
+  }, [netid, refresh]);
 
   const getCards = () => {
     const cards = [];
-    courseDocs.forEach(doc => {
+    courseDocs.forEach((doc) => {
       const data = doc.data();
-      cards.push(<ClassCard key={data.subject + data.number } {...data} />)
+      cards.push(<ClassCard key={data.subject + data.number} {...data} />);
     });
     return cards;
-  }
+  };
 
   return (
-    <div className="existing-links container"> 
-      <h1>Signed in{netid && " as " + netid}</h1>
-         <div className="courses">
-            <ul> 
-              {getCards().map(card => card)}
-            </ul> 
-        </div> 
+    <div className="professor">
+      <Helmet>
+        <title>Cornell Zoom Hub | Professor</title>
+        <meta name="title" content="Cornell Zoom Hub | Professor" />
+        <meta name="description" content="Cornell Zoom Hub | Professor Page" />
+      </Helmet>
+      <div className="container">
+        <h1>Professor{netid && ": " + netid}</h1>
+        <div className="courses">
+          <ul>{getCards().map((card) => card)}</ul>
+        </div>
+      </div>
     </div>
-  )
+  );
 }
 
 export default Professor;

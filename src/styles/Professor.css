@@ -1,54 +1,39 @@
-h1 {
-  margin-top: 20px;
+.professor h1 {
+  padding-top: 20px;
 }
-
-h2 {
+.professor h2 {
   font-size: 1.4em;
 }
+.modal-header h3 {
+  margin: 0;
+}
 
-.courses {
+.professor .courses {
   margin: 10px;
 }
 
-.btn {
+.professor .btn {
   margin: 8px;
 }
 
-.existing-links a {
+.professor a {
   text-decoration: none;
 }
-.existing-links ul {
+.professor ul {
   padding: 0;
 }
-.existing-links li {
+.professor li {
   list-style-type: none;
   padding: 10px 20px;
   margin: 10px auto;
   border-radius: 10px;
   position: relative;
-  max-width: 50%;
 }
-.existing-links li p {
+.professor li p {
   margin: 0;
 }
 
-@media (max-width: 1000px) {
-  .existing-links li {
-    max-width: 70%;
-  }
-}
-@media (max-width: 700px) {
-  .existing-links li {
-    max-width: 85%;
-  }
-}
-@media (max-width: 500px) {
-  .existing-links li {
-    max-width: 100%;
-  }
-}
-
-textarea {
+.professor textarea {
   height: 20vh !important;
   resize: none;
 }
