@@ -222,6 +222,15 @@ function Professor() {
       </Helmet>
       <div className="container">
         <h1>Professor{netid && ": " + netid}</h1>
+        <button
+          className="btn btn-danger"
+          onClick={() => {
+            app.auth().signOut();
+            document.location.href = "/";
+          }}
+        >
+          Sign Out
+        </button>
         <div className="courses">
           <ul>{getCards().map((card) => card)}</ul>
         </div>
