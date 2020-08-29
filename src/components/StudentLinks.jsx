@@ -152,7 +152,7 @@ export const LinkInput = ({ netid, setAddingLink, setRefresh, setError }) => {
   );
 };
 
-export function ExistingLinks({ netid }) {
+export function ExistingLinks({ netid, setRefresh }) {
   const [linkDocs, setLinkDocs] = useState([]);
   const [links, setLinks] = useState([]);
   const [lastUpdated, setLastUpdated] = useState("");
@@ -205,6 +205,7 @@ export function ExistingLinks({ netid }) {
             .catch((err) => {
               console.log(err);
             });
+          setRefresh(true);
         })
         .catch((err) => {
           console.log(err);
@@ -232,27 +233,33 @@ export function ExistingLinks({ netid }) {
             /^(http:\/\/|https:\/\/)?(cornell\.zoom+\.us+\/j\/)([0-9]{9,11})(\?pwd=[a-zA-Z0-9]+)?$/
           );
           return (
-            <Link key={id} to={"/link/" + id}>
-              <li className="bg-light">
-                <img
-                  src={x}
-                  width="22"
-                  alt="Delete link."
-                  className="delete-x"
-                  onClick={() => deleteLink(id)}
-                />
-                <h2>{name}</h2>
-                {id && <p className="text-dark">{generateUrl(id)}</p>}
-                <p className={cornellZoomLink ? "text-success" : "text-info"}>
-                  {url}
-                </p>
-              </li>
-            </Link>
+            <li className="bg-light" key={id}>
+              <img
+                src={x}
+                width="22"
+                alt="Delete link."
+                className="delete-x"
+                onClick={() => deleteLink(id)}
+              />
+              <h2>
+                <Link
+                  to={"/link/" + id}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {name}
+                </Link>
+              </h2>
+              {id && <p className="text-dark">{generateUrl(id)}</p>}
+              <p className={cornellZoomLink ? "text-success" : "text-info"}>
+                {url}
+              </p>
+            </li>
           );
         });
     };
     setLinks(formatLinks());
-  }, [linkDocs, netid]);
+  }, [linkDocs, netid, setRefresh]);
 
   return (
     <div className="personal-links">

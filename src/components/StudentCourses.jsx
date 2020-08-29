@@ -128,7 +128,7 @@ export function CourseInput({ netid, setAddingCourse, setRefresh, setError }) {
   );
 }
 
-export function CourseLinks({ netid }) {
+export function CourseLinks({ netid, setRefresh }) {
   const [coursesArray, setCoursesArray] = useState([]);
   const [links, setLinks] = useState([]);
 
@@ -151,13 +151,14 @@ export function CourseLinks({ netid }) {
   }, [netid]);
 
   useEffect(() => {
-    const deleteCourse = (course) => {
-      users
+    const deleteCourse = async (course) => {
+      await users
         .doc(netid)
         .update({ courses: arrayRemove(course) })
         .catch((err) => {
           console.log(err);
         });
+      setRefresh(true);
     };
 
     const formatLinks = async () => {
@@ -200,29 +201,35 @@ export function CourseLinks({ netid }) {
             /^(http:\/\/|https:\/\/)?(cornell\.zoom+\.us+\/j\/)([0-9]{9,11})(\?pwd=[a-zA-Z0-9]+)?$/
           );
           return (
-            <Link key={course} to={"/courses/" + course}>
-              <li className="bg-light">
-                <img
-                  src={x}
-                  width="22"
-                  alt="Delete course."
-                  className="delete-x"
-                  onClick={() => deleteCourse(course)}
-                />
-                <h2>{course}</h2>
-                {course && <p className="text-dark">{generateUrl(course)}</p>}
-                <p className={cornellZoomLink ? "text-success" : "text-info"}>
-                  {url}
-                </p>
-              </li>
-            </Link>
+            <li className="bg-light" key={course}>
+              <img
+                src={x}
+                width="22"
+                alt="Delete course."
+                className="delete-x"
+                onClick={() => deleteCourse(course)}
+              />
+              <h2>
+                <Link
+                  to={"/courses/" + course}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {course}
+                </Link>
+              </h2>
+              {course && <p className="text-dark">{generateUrl(course)}</p>}
+              <p className={cornellZoomLink ? "text-success" : "text-info"}>
+                {url}
+              </p>
+            </li>
           );
         });
     };
     formatLinks().then((res) => {
       setLinks(res);
     });
-  }, [coursesArray, netid]);
+  }, [coursesArray, netid, setRefresh]);
 
   return (
     <div className="course-links">{!!links.length && <ul>{links}</ul>}</div>

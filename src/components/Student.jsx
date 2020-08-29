@@ -88,7 +88,9 @@ function Student() {
           )}
           {linkError && <p className="text-danger">{linkError}</p>}
         </div>
-        {!refreshLinks && <ExistingLinks netid={netid} />}
+        {!refreshLinks && (
+          <ExistingLinks netid={netid} setRefresh={setRefreshLinks} />
+        )}
         <hr />
         <div className="add-course">
           {addingCourse || courseError ? (
@@ -120,7 +122,9 @@ function Student() {
           )}
           {courseError && <p className="text-danger">{courseError}</p>}
         </div>
-        {!refreshCourses && <CourseLinks netid={netid} />}
+        {!refreshCourses && (
+          <CourseLinks netid={netid} setRefresh={setRefreshCourses} />
+        )}
       </div>
     </div>
   );
