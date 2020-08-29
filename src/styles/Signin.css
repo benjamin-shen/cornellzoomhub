@@ -3,6 +3,14 @@
   display: grid;
   place-items: center;
 }
+.signin h1 {
+  margin: 0;
+}
 .signin p {
   margin: 5px;
+}
+.signin .google {
+  margin: 0;
+  display: grid;
+  place-items: center;
 }

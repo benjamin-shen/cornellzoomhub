@@ -27,7 +27,9 @@ function Signin() {
         <h1>
           <span className="cornell">Cornell</span> Zoom Hub
         </h1>
-        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={app.auth()} />
+        <div className="google">
+          <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={app.auth()} />
+        </div>
         <p>
           Design:{" "}
           <a
