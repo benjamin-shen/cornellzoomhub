@@ -1,19 +1,21 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Helmet } from "react-helmet";
 import { Redirect } from "react-router-dom";
 
-import { AuthContext } from "../util/auth";
-import app from "../util/base";
+import { AuthContext } from "../../util/auth";
+import app from "../../util/base";
+
+import LinkRedirect from "./LinkRedirect";
 
 const users = app.firestore().collection("users");
 
-function LinkRedirect({
+function UserLinkRedirect({
   match: {
     params: { slug },
   },
 }) {
   const { netid } = useContext(AuthContext);
   const [invalid, setInvalid] = useState(false);
+  const [url, setUrl] = useState();
 
   useEffect(() => {
     if (slug && netid) {
@@ -24,10 +26,10 @@ function LinkRedirect({
         .get()
         .then((doc) => {
           if (doc.exists) {
-            const url = doc.data().url;
-            if (url) {
+            const redirectUrl = doc.data().url;
+            if (redirectUrl) {
               setInvalid(false);
-              window.location.href = url;
+              setUrl(redirectUrl);
               return;
             }
           }
@@ -44,19 +46,7 @@ function LinkRedirect({
     return <Redirect to="/" />;
   }
 
-  return (
-    <div className="link-redirect">
-      <Helmet>
-        <title>Cornell Zoom Hub | Redirecting</title>
-        <meta name="title" content="Cornell Zoom Hub | Redirecting" />
-        <meta
-          name="description"
-          content="Cornell Zoom Hub | Redirecting to external link..."
-        />
-      </Helmet>
-      <p className="message">Redirecting...</p>
-    </div>
-  );
+  return <LinkRedirect url={url} />;
 }
 
-export default LinkRedirect;
+export default UserLinkRedirect;

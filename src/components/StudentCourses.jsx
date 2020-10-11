@@ -192,7 +192,7 @@ export function CourseLinks({ netid, setRefresh }) {
       const generateUrl = (course) => {
         const href = window.location.href;
         const root = href.substring(0, href.lastIndexOf("/"));
-        return root + "/courses/" + course;
+        return root + "/course/" + course;
       };
       return result
         .filter(({ course, url }) => course && url)
@@ -211,7 +211,7 @@ export function CourseLinks({ netid, setRefresh }) {
               />
               <h2>
                 <Link
-                  to={"/courses/" + course}
+                  to={"/course/" + course}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

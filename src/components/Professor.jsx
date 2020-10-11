@@ -28,7 +28,7 @@ function ClassCard({ subject, number }) {
   const generateUrl = (course) => {
     const href = window.location.href;
     const root = href.substring(0, href.lastIndexOf("/"));
-    return root + "/courses/" + course;
+    return root + "/course/" + course;
   };
 
   useEffect(() => {

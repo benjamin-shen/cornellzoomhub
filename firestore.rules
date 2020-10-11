@@ -5,11 +5,14 @@ service cloud.firestore {
       return request.auth != null && request.auth.token.email.matches('.*@cornell[.]edu');
     }
 
+    match /users/{netid}/{links=**} {
+      allow read, write: if validEmail() && netid + "@cornell.edu" == request.auth.token.email;
+    }
     match /courses/{course=**} {
       allow read, write: if validEmail();
     }
-    match /users/{netid}/{links=**} {
-      allow read, write: if validEmail() && netid + "@cornell.edu" == request.auth.token.email;
+    match /events/{event=**} {
+      allow read, write: if validEmail();
     }
     match /professors/{professor=**} {
       allow read: if validEmail();
