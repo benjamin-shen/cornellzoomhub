@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
 
 import app, { GoogleAuthProvider } from "../util/base";
@@ -14,10 +14,13 @@ const uiConfig = {
   ],
 };
 
-function Signin() {
+function Signin({ location: { state } }) {
   const { currentUser, isProf } = useContext(AuthContext);
 
   if (currentUser) {
+    if (state && state.referrer) {
+      return <Redirect to={state.referrer} />;
+    }
     return isProf ? <Redirect to="/professor" /> : <Redirect to="/student" />;
   }
 
