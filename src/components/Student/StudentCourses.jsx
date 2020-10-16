@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 
 import app, { arrayUnion, arrayRemove } from "../../util/base";
 
-import "../../styles/Student.css";
 import x from "../../assets/icons/x.svg";
 
 const users = app.firestore().collection("users");

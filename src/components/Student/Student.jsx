@@ -5,6 +5,7 @@ import { AuthContext } from "../../util/auth";
 import app from "../../util/base";
 
 import { LinkInput, ExistingLinks } from "./StudentLinks";
+import { EventInput, EventLinks } from "./StudentEvents";
 import { CourseInput, CourseLinks } from "./StudentCourses";
 import "../../styles/Student.css";
 
@@ -14,6 +15,10 @@ function Student() {
   const [addingLink, setAddingLink] = useState(false);
   const [linkError, setLinkError] = useState("");
   const [refreshLinks, setRefreshLinks] = useState(false);
+
+  const [addingEvent, setAddingEvent] = useState(false);
+  const [eventError, setEventError] = useState("");
+  const [refreshEvents, setRefreshEvents] = useState(false);
 
   const [addingCourse, setAddingCourse] = useState(false);
   const [courseError, setCourseError] = useState("");
@@ -25,6 +30,12 @@ function Student() {
       setRefreshLinks(false);
     }
   }, [refreshLinks]);
+  useEffect(() => {
+    if (refreshEvents) {
+      setEventError("");
+      setRefreshEvents(false);
+    }
+  }, [refreshEvents]);
   useEffect(() => {
     if (refreshCourses) {
       setCourseError("");
@@ -90,6 +101,40 @@ function Student() {
         </div>
         {!refreshLinks && (
           <ExistingLinks netid={netid} setRefresh={setRefreshLinks} />
+        )}
+        <hr />
+        <div className="add-event">
+          {addingEvent || eventError ? (
+            <EventInput
+              netid={netid}
+              setAddingEvent={setAddingEvent}
+              setRefresh={setRefreshEvents}
+              setError={(message) => {
+                if (message) {
+                  setEventError("Error!");
+                  setTimeout(() => {
+                    if (!mountedRef.current) return null;
+                    setEventError(message);
+                  }, 500);
+                } else {
+                  setEventError(message);
+                }
+              }}
+            />
+          ) : (
+            <button
+              className="btn btn-info"
+              onClick={() => {
+                setAddingEvent(true);
+              }}
+            >
+              Create/Edit Event Link
+            </button>
+          )}
+          {eventError && <p className="text-danger">{eventError}</p>}
+        </div>
+        {!refreshEvents && (
+          <EventLinks netid={netid} setRefresh={setRefreshEvents} />
         )}
         <hr />
         <div className="add-course">
