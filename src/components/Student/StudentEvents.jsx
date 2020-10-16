@@ -197,7 +197,7 @@ export function EventLinks({ netid, setRefresh }) {
   }, [netid]);
 
   useEffect(() => {
-    const deleteCourse = async (event) => {
+    const deleteEvent = async (event) => {
       await users
         .doc(netid)
         .update({ events: arrayRemove(event) })
@@ -224,6 +224,9 @@ export function EventLinks({ netid, setRefresh }) {
                   url: link,
                 });
               }
+            } else {
+              deleteEvent(slug);
+              console.log(`${slug} doesn't exist.`);
             }
           })
           .catch((err) => {
@@ -248,7 +251,7 @@ export function EventLinks({ netid, setRefresh }) {
                 width="22"
                 alt="Delete course."
                 className="delete-x"
-                onClick={() => deleteCourse(slug)}
+                onClick={() => deleteEvent(slug)}
               />
               <h2>
                 <Link
