@@ -26,10 +26,7 @@ export function EventInput({ netid, setAddingEvent, setRefresh, setError }) {
   }, [linkInput]);
 
   const addLink = async (slug, name, url) => {
-    if (!slug) {
-      setError("Missing slug name.");
-      return;
-    } else if (!slug.match(/^[a-z0-9-&+]+$/)) {
+    if (slug && !slug.toLowerCase().match(/^[a-z0-9-&+]+$/)) {
       console.log(slug);
       setError(
         "Slug does not match regex." +
@@ -42,15 +39,16 @@ export function EventInput({ netid, setAddingEvent, setRefresh, setError }) {
       return;
     }
 
+    const event = {
+      name: name || slug || url,
+      owner: netid,
+      link: urlLink,
+      created: new Date(),
+    };
     const setLink = () => {
       events
         .doc(slug)
-        .set({
-          name,
-          owner: netid,
-          link: urlLink,
-          created: new Date(),
-        })
+        .set(event)
         .then(async () => {
           await users
             .doc(netid)
@@ -70,28 +68,54 @@ export function EventInput({ netid, setAddingEvent, setRefresh, setError }) {
           return;
         });
     };
-    setPending(true);
-    if (netid) {
-      await events
-        .doc(slug)
-        .get()
-        .then((doc) => {
-          if (doc.exists) {
-            const data = doc.data();
-            if (data.owner && data.owner === netid) {
-              setLink();
-            } else {
-              setError("This slug is already in use. Please choose another.");
+    const setNewLink = () => {
+      events
+        .add(event)
+        .then(async (doc) => {
+          await users
+            .doc(netid)
+            .update({
+              events: arrayUnion(doc.id),
+            })
+            .catch((err) => {
+              console.log(err);
+              setError("The user could not be associated with this event.");
               return;
-            }
-          } else {
-            setLink();
-          }
+            });
+          setRefresh(true);
         })
         .catch((err) => {
           console.log(err);
-          setError("There was an error adding the link.");
+          setError("The link could not be added.");
+          return;
         });
+    };
+    setPending(true);
+    if (netid) {
+      if (slug) {
+        await events
+          .doc(slug)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
+              if (data.owner && data.owner === netid) {
+                setLink();
+              } else {
+                setError("This slug is already in use. Please choose another.");
+                return;
+              }
+            } else {
+              setLink();
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            setError("There was an error adding the link.");
+          });
+      } else {
+        setNewLink();
+      }
     } else {
       setError("Missing netid.");
     }
@@ -124,9 +148,8 @@ export function EventInput({ netid, setAddingEvent, setRefresh, setError }) {
         type="text"
         className="form-control mb-2 mr-sm-2 center"
         id="slug-input"
-        placeholder="Slug"
+        placeholder="Slug (leave blank for random)"
         onChange={handleSlugChange}
-        required
       />
       <label className="sr-only" htmlFor="name-input">
         Nickname
@@ -204,6 +227,14 @@ export function EventLinks({ netid, setRefresh }) {
         .catch((err) => {
           console.log(err);
         });
+      if (event) {
+        events
+          .doc(event)
+          .delete()
+          .catch((err) => {
+            console.log(err);
+          });
+      }
       setRefresh(true);
     };
 
@@ -211,27 +242,30 @@ export function EventLinks({ netid, setRefresh }) {
       const result = [];
       eventsArray.sort();
       for (const slug of eventsArray) {
-        await events
-          .doc(slug)
-          .get()
-          .then((doc) => {
-            if (doc.exists) {
-              const { name, link, owner } = doc.data();
-              if (link) {
-                result.push({
-                  name,
-                  slug,
-                  url: link,
-                });
+        if (slug) {
+          await events
+            .doc(slug)
+            .get()
+            .then((doc) => {
+              if (doc.exists) {
+                const data = doc.data();
+                if (data.link) {
+                  result.push({
+                    slug,
+                    data,
+                  });
+                }
+              } else {
+                deleteEvent(slug);
+                console.log(`${slug} doesn't exist.`);
               }
-            } else {
-              deleteEvent(slug);
-              console.log(`${slug} doesn't exist.`);
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        } else {
+          deleteEvent(slug);
+        }
       }
       const generateUrl = (slug) => {
         const href = window.location.href;
@@ -239,8 +273,11 @@ export function EventLinks({ netid, setRefresh }) {
         return root + "/events/" + slug;
       };
       return result
-        .filter(({ name, slug, url }) => name && slug && url)
-        .map(({ name, slug, url }) => {
+        .filter(
+          ({ slug, data }) =>
+            slug.toLowerCase().match(/^[a-z0-9-&+]+$/) && data && data.link
+        )
+        .map(({ slug, data: { name, link: url } }) => {
           const cornellZoomLink = url.match(
             /^(http:\/\/|https:\/\/)?(cornell\.zoom+\.us+\/j\/)([0-9]{9,11})(\?pwd=[a-zA-Z0-9]+)?$/
           );

@@ -32,7 +32,7 @@ export function LinkInput({ netid, setAddingLink, setRefresh, setError }) {
     if (!slug) {
       setError("Missing slug name.");
       return;
-    } else if (!slug.match(/^[a-z0-9-&+]+$/)) {
+    } else if (!slug.toLowerCase().match(/^[a-z0-9-&+]+$/)) {
       console.log(slug);
       setError(
         "Slug does not match regex." +
@@ -216,7 +216,7 @@ export function ExistingLinks({ netid, setRefresh }) {
       const result = [];
       linkDocs.forEach((linkDoc) => {
         result.push({
-          id: linkDoc.id,
+          slug: linkDoc.id,
           data: linkDoc.data(),
         });
       });
@@ -227,30 +227,33 @@ export function ExistingLinks({ netid, setRefresh }) {
         return root + "/link/" + slug;
       };
       return result
-        .filter(({ id, data }) => id.match(/^[a-z0-9-+]+$/) && data && data.url)
-        .map(({ id, data: { name, url } }) => {
+        .filter(
+          ({ slug, data }) =>
+            slug.toLowerCase().match(/^[a-z0-9-&+]+$/) && data && data.url
+        )
+        .map(({ slug, data: { name, url } }) => {
           const cornellZoomLink = url.match(
             /^(http:\/\/|https:\/\/)?(cornell\.zoom+\.us+\/j\/)([0-9]{9,11})(\?pwd=[a-zA-Z0-9]+)?$/
           );
           return (
-            <li className="bg-light" key={id}>
+            <li className="bg-light" key={slug}>
               <img
                 src={x}
                 width="22"
                 alt="Delete link."
                 className="delete-x"
-                onClick={() => deleteLink(id)}
+                onClick={() => deleteLink(slug)}
               />
               <h2>
                 <Link
-                  to={"/link/" + id}
+                  to={"/link/" + slug}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   {name}
                 </Link>
               </h2>
-              {id && <p className="text-dark">{generateUrl(id)}</p>}
+              {slug && <p className="text-dark">{generateUrl(slug)}</p>}
               <p className={cornellZoomLink ? "text-success" : "text-info"}>
                 {url}
               </p>
