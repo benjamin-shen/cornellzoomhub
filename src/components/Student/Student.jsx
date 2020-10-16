@@ -1,12 +1,12 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet";
 
-import { AuthContext } from "../util/auth";
-import app from "../util/base";
+import { AuthContext } from "../../util/auth";
+import app from "../../util/base";
 
 import { LinkInput, ExistingLinks } from "./StudentLinks";
 import { CourseInput, CourseLinks } from "./StudentCourses";
-import "../styles/Student.css";
+import "../../styles/Student.css";
 
 function Student() {
   const { netid } = useContext(AuthContext);

@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 
 import moment from "moment-timezone";
 
-import app from "../util/base";
+import app from "../../util/base";
 
-import "../styles/Student.css";
-import x from "../assets/icons/x.svg";
+import "../../styles/Student.css";
+import x from "../../assets/icons/x.svg";
 
 moment.tz.setDefault("America/New_York");
 const users = app.firestore().collection("users");

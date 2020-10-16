@@ -3,10 +3,10 @@ import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 
-import { AuthContext } from "../util/auth";
-import app from "../util/base";
+import { AuthContext } from "../../util/auth";
+import app from "../../util/base";
 
-import "../styles/Professor.css";
+import "../../styles/Professor.css";
 
 const professors = app.firestore().collection("professors");
 const courses = app.firestore().collection("courses");
