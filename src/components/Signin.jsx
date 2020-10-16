@@ -8,6 +8,7 @@ import { AuthContext } from "../util/auth";
 import "../styles/Signin.css";
 
 const uiConfig = {
+  signInFlow: "popup",
   signInOptions: [
     { provider: GoogleAuthProvider, customParameters: { hd: "cornell.edu" } },
   ],
