@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-import app, { arrayUnion, arrayRemove } from "../util/base";
+import app, { arrayUnion, arrayRemove } from "../../util/base";
 
-import "../styles/Student.css";
-import x from "../assets/icons/x.svg";
+import x from "../../assets/icons/x.svg";
 
 const users = app.firestore().collection("users");
 const courses = app.firestore().collection("courses");

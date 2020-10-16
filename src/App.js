@@ -10,8 +10,8 @@ import {
 import { AuthProvider } from "./util/auth";
 import PrivateRoute from "./util/PrivateRoute";
 import Signin from "./components/Signin";
-import Student from "./components/Student";
-import Professor from "./components/Professor";
+import Student from "./components/Student/Student";
+import Professor from "./components/Professor/Professor";
 import UserLinkRedirect from "./components/Link Redirects/UserLinkRedirect";
 import CourseLinkRedirect from "./components/Link Redirects/CourseLinkRedirect";
 import EventLinkRedirect from "./components/Link Redirects/EventLinkRedirect";
