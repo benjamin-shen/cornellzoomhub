@@ -14,7 +14,7 @@ const PrivateRoute = ({ history, location, profRoute, ...rest }) => {
   }
 
   if (profRoute && !isProf) {
-    return <Redirect to="/student" />;
+    return <Redirect to="/user" />;
   }
 
   return <Route {...rest} />;

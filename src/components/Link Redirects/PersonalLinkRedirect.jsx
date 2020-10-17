@@ -8,7 +8,7 @@ import LinkRedirect from "./LinkRedirect";
 
 const users = app.firestore().collection("users");
 
-function UserLinkRedirect({
+function PersonalLinkRedirect({
   match: {
     params: { slug },
   },
@@ -49,4 +49,4 @@ function UserLinkRedirect({
   return <LinkRedirect url={url} />;
 }
 
-export default UserLinkRedirect;
+export default PersonalLinkRedirect;

@@ -1,26 +1,26 @@
-.student h1 {
+.user h1 {
   padding-top: 20px;
   margin-bottom: 0;
 }
-.student h2 {
+.user h2 {
   font-size: 1.4em;
 }
-.student .btn {
+.user .btn {
   margin: 8px;
 }
-.student a {
+.user a {
   text-decoration: none;
 }
-.student ul {
+.user ul {
   padding: 0;
 }
-.student li {
+.user li {
   list-style-type: none;
   padding: 10px 20px;
   margin: 10px auto;
   border-radius: 10px;
   position: relative;
 }
-.student li p {
+.user li p {
   margin: 0;
 }

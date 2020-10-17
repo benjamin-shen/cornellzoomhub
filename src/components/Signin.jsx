@@ -15,13 +15,13 @@ const uiConfig = {
 };
 
 function Signin({ location: { state } }) {
-  const { currentUser, isProf } = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
   if (currentUser) {
     if (state && state.referrer) {
       return <Redirect to={state.referrer} />;
     }
-    return isProf ? <Redirect to="/professor" /> : <Redirect to="/student" />;
+    return <Redirect to="/user" />;
   }
 
   return (

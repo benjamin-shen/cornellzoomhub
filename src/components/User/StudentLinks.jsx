@@ -5,7 +5,7 @@ import moment from "moment-timezone";
 
 import app from "../../util/base";
 
-import "../../styles/Student.css";
+import "../../styles/User.css";
 import x from "../../assets/icons/x.svg";
 
 moment.tz.setDefault("America/New_York");
@@ -129,13 +129,13 @@ export function LinkInput({ netid, setAddingLink, setRefresh, setError }) {
       />
       {pending ? (
         <p className="text-info">
-          Setting redirect link to {urlLink} at /link/{slugInput}
+          Setting redirect link to {urlLink} at /user/link/{slugInput}
         </p>
       ) : (
         <>
           <button type="submit" className="btn btn-outline-primary">
             Set redirect link{linkInput && " to " + linkInput}
-            {slugInput && " at /link/" + slugInput}
+            {slugInput && " at /user/link/" + slugInput}
           </button>
           <button
             className="btn btn-outline-danger"
@@ -224,7 +224,7 @@ export function ExistingLinks({ netid, setRefresh }) {
       const generateUrl = (slug) => {
         const href = window.location.href;
         const root = href.substring(0, href.lastIndexOf("/"));
-        return root + "/link/" + slug;
+        return root + "/user/link/" + slug;
       };
       return result
         .filter(
@@ -246,7 +246,7 @@ export function ExistingLinks({ netid, setRefresh }) {
               />
               <h2>
                 <Link
-                  to={"/link/" + slug}
+                  to={"/user/link/" + slug}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
