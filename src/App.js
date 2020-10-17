@@ -10,11 +10,18 @@ import {
 import { AuthProvider } from "./util/auth";
 import PrivateRoute from "./util/PrivateRoute";
 import Signin from "./components/Signin";
-import Student from "./components/Student/Student";
+
+import UserPage from "./components/User/UserPage";
+import UserPersonal from "./components/User/PersonalLinksPage";
+import UserEvents from "./components/User/EventLinksPage";
+import UserCourses from "./components/User/CourseLinksPage";
+
 import Professor from "./components/Professor/Professor";
-import UserLinkRedirect from "./components/Link Redirects/UserLinkRedirect";
+
+import PersonalLinkRedirect from "./components/Link Redirects/PersonalLinkRedirect";
 import CourseLinkRedirect from "./components/Link Redirects/CourseLinkRedirect";
 import EventLinkRedirect from "./components/Link Redirects/EventLinkRedirect";
+
 import "./styles/App.css";
 
 const PageNotFound = () => {
@@ -42,11 +49,18 @@ function App() {
               component={Professor}
               profRoute
             />
-            <PrivateRoute exact path="/student" component={Student} />
+            <PrivateRoute exact path="/user" component={UserPage} />
             <PrivateRoute
               exact
-              path="/link/:slug"
-              component={UserLinkRedirect}
+              path="/user/personal"
+              component={UserPersonal}
+            />
+            <PrivateRoute exact path="/user/events" component={UserEvents} />
+            <PrivateRoute exact path="/user/courses" component={UserCourses} />
+            <PrivateRoute
+              exact
+              path="/user/link/:slug"
+              component={PersonalLinkRedirect}
             />
             <PrivateRoute
               exact

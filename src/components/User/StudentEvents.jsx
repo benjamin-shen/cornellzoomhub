@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-import moment from "moment-timezone";
+import app, { arrayUnion, arrayRemove } from "../../util/base";
 
-import app from "../../util/base";
-
-import "../../styles/Student.css";
 import x from "../../assets/icons/x.svg";
 
-moment.tz.setDefault("America/New_York");
 const users = app.firestore().collection("users");
+const events = app.firestore().collection("events");
 
-export function LinkInput({ netid, setAddingLink, setRefresh, setError }) {
+export function EventInput({ netid, setAddingEvent, setRefresh, setError }) {
   const [slugInput, setSlugInput] = useState("");
   const [nameInput, setNameInput] = useState("");
   const [linkInput, setLinkInput] = useState("");
@@ -29,10 +26,7 @@ export function LinkInput({ netid, setAddingLink, setRefresh, setError }) {
   }, [linkInput]);
 
   const addLink = async (slug, name, url) => {
-    if (!slug) {
-      setError("Missing slug name.");
-      return;
-    } else if (!slug.toLowerCase().match(/^[a-z0-9-&+]+$/)) {
+    if (slug && !slug.toLowerCase().match(/^[a-z0-9-&+]+$/)) {
       console.log(slug);
       setError(
         "Slug does not match regex." +
@@ -45,31 +39,83 @@ export function LinkInput({ netid, setAddingLink, setRefresh, setError }) {
       return;
     }
 
-    setPending(true);
-    if (netid) {
-      await users
-        .doc(netid)
-        .collection("links")
+    const event = {
+      name: name || slug || url,
+      owner: netid,
+      link: urlLink,
+      created: new Date(),
+    };
+    const setLink = () => {
+      events
         .doc(slug)
-        .set({
-          name: name || slug,
-          url: urlLink,
-        })
+        .set(event)
         .then(async () => {
           await users
             .doc(netid)
             .update({
-              lastUpdated: new Date(),
+              events: arrayUnion(slug),
             })
             .catch((err) => {
               console.log(err);
+              setError("The user could not be associated with this event.");
+              return;
             });
           setRefresh(true);
         })
         .catch((err) => {
           console.log(err);
-          setError("There was an error adding the link.");
+          setError("The link could not be added.");
+          return;
         });
+    };
+    const setNewLink = () => {
+      events
+        .add(event)
+        .then(async (doc) => {
+          await users
+            .doc(netid)
+            .update({
+              events: arrayUnion(doc.id),
+            })
+            .catch((err) => {
+              console.log(err);
+              setError("The user could not be associated with this event.");
+              return;
+            });
+          setRefresh(true);
+        })
+        .catch((err) => {
+          console.log(err);
+          setError("The link could not be added.");
+          return;
+        });
+    };
+    setPending(true);
+    if (netid) {
+      if (slug) {
+        await events
+          .doc(slug)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
+              if (data.owner && data.owner === netid) {
+                setLink();
+              } else {
+                setError("This slug is already in use. Please choose another.");
+                return;
+              }
+            } else {
+              setLink();
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            setError("There was an error adding the link.");
+          });
+      } else {
+        setNewLink();
+      }
     } else {
       setError("Missing netid.");
     }
@@ -89,7 +135,7 @@ export function LinkInput({ netid, setAddingLink, setRefresh, setError }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     addLink(slugInput, nameInput, linkInput).then(() => {
-      setAddingLink(false);
+      setAddingEvent(false);
     });
   };
 
@@ -102,9 +148,8 @@ export function LinkInput({ netid, setAddingLink, setRefresh, setError }) {
         type="text"
         className="form-control mb-2 mr-sm-2 center"
         id="slug-input"
-        placeholder="Slug"
+        placeholder="Slug (leave blank for random)"
         onChange={handleSlugChange}
-        required
       />
       <label className="sr-only" htmlFor="name-input">
         Nickname
@@ -129,19 +174,19 @@ export function LinkInput({ netid, setAddingLink, setRefresh, setError }) {
       />
       {pending ? (
         <p className="text-info">
-          Setting redirect link to {urlLink} at /link/{slugInput}
+          Setting redirect link to {urlLink} at /event/{slugInput}
         </p>
       ) : (
         <>
           <button type="submit" className="btn btn-outline-primary">
             Set redirect link{linkInput && " to " + linkInput}
-            {slugInput && " at /link/" + slugInput}
+            {slugInput && " at /event/" + slugInput}
           </button>
           <button
             className="btn btn-outline-danger"
             onClick={() => {
               setError("");
-              setAddingLink(false);
+              setAddingEvent(false);
             }}
           >
             Cancel
@@ -152,33 +197,19 @@ export function LinkInput({ netid, setAddingLink, setRefresh, setError }) {
   );
 }
 
-export function ExistingLinks({ netid, setRefresh }) {
-  const [linkDocs, setLinkDocs] = useState([]);
+export function EventLinks({ netid, setRefresh }) {
+  const [eventsArray, setEventsArray] = useState([]);
   const [links, setLinks] = useState([]);
-  const [lastUpdated, setLastUpdated] = useState("");
 
   useEffect(() => {
     const getLinks = () => {
       users
         .doc(netid)
-        .collection("links")
-        .where("url", ">", "")
-        .get()
-        .then((docs) => {
-          setLinkDocs(docs);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    };
-    const getLastUpdated = () => {
-      users
-        .doc(netid)
         .get()
         .then((doc) => {
           const data = doc.data();
-          if (data && data.lastUpdated) {
-            setLastUpdated(moment(data.lastUpdated.toDate()).format("LLLL"));
+          if (data && data.events) {
+            setEventsArray(data.events);
           }
         })
         .catch((err) => {
@@ -186,52 +217,67 @@ export function ExistingLinks({ netid, setRefresh }) {
         });
     };
     getLinks();
-    getLastUpdated();
   }, [netid]);
 
   useEffect(() => {
-    const deleteLink = (id) => {
-      users
+    const deleteEvent = async (event) => {
+      await users
         .doc(netid)
-        .collection("links")
-        .doc(id)
-        .delete()
-        .then(async () => {
-          await users
-            .doc(netid)
-            .update({
-              lastUpdated: new Date(),
+        .update({ events: arrayRemove(event) })
+        .catch((err) => {
+          console.log(err);
+        });
+      if (event) {
+        events
+          .doc(event)
+          .delete()
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+      setRefresh(true);
+    };
+
+    const formatLinks = async () => {
+      const result = [];
+      eventsArray.sort();
+      for (const slug of eventsArray) {
+        if (slug) {
+          await events
+            .doc(slug)
+            .get()
+            .then((doc) => {
+              if (doc.exists) {
+                const data = doc.data();
+                if (data.link) {
+                  result.push({
+                    slug,
+                    data,
+                  });
+                }
+              } else {
+                deleteEvent(slug);
+                console.log(`${slug} doesn't exist.`);
+              }
             })
             .catch((err) => {
               console.log(err);
             });
-          setRefresh(true);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    };
-
-    const formatLinks = () => {
-      const result = [];
-      linkDocs.forEach((linkDoc) => {
-        result.push({
-          slug: linkDoc.id,
-          data: linkDoc.data(),
-        });
-      });
-      result.sort((a, b) => (a.data.name > b.data.name ? 1 : -1));
+        } else {
+          deleteEvent(slug);
+        }
+      }
       const generateUrl = (slug) => {
         const href = window.location.href;
         const root = href.substring(0, href.lastIndexOf("/"));
-        return root + "/link/" + slug;
+        return root + "/events/" + slug;
       };
       return result
         .filter(
           ({ slug, data }) =>
-            slug.toLowerCase().match(/^[a-z0-9-&+]+$/) && data && data.url
+            slug.toLowerCase().match(/^[a-z0-9-&+]+$/) && data && data.link
         )
-        .map(({ slug, data: { name, url } }) => {
+        .map(({ slug, data: { name, link: url } }) => {
           const cornellZoomLink = url.match(
             /^(http:\/\/|https:\/\/)?(cornell\.zoom+\.us+\/j\/)([0-9]{9,11})(\?pwd=[a-zA-Z0-9]+)?$/
           );
@@ -240,13 +286,13 @@ export function ExistingLinks({ netid, setRefresh }) {
               <img
                 src={x}
                 width="22"
-                alt="Delete link."
+                alt="Delete course."
                 className="delete-x"
-                onClick={() => deleteLink(slug)}
+                onClick={() => deleteEvent(slug)}
               />
               <h2>
                 <Link
-                  to={"/link/" + slug}
+                  to={"/event/" + slug}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -261,13 +307,10 @@ export function ExistingLinks({ netid, setRefresh }) {
           );
         });
     };
-    setLinks(formatLinks());
-  }, [linkDocs, netid, setRefresh]);
+    formatLinks().then((res) => {
+      setLinks(res);
+    });
+  }, [eventsArray, netid, setRefresh]);
 
-  return (
-    <div className="personal-links">
-      {!!links.length && <ul>{links}</ul>}
-      {!!links.length && lastUpdated && <p>{"Last Updated: " + lastUpdated}</p>}
-    </div>
-  );
+  return <div className="links">{!!links.length && <ul>{links}</ul>}</div>;
 }

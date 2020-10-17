@@ -230,7 +230,5 @@ export function CourseLinks({ netid, setRefresh }) {
     });
   }, [coursesArray, netid, setRefresh]);
 
-  return (
-    <div className="course-links">{!!links.length && <ul>{links}</ul>}</div>
-  );
+  return <div className="links">{!!links.length && <ul>{links}</ul>}</div>;
 }
