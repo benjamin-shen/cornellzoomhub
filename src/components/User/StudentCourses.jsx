@@ -189,8 +189,7 @@ export function CourseLinks({ netid, setRefresh }) {
           });
       }
       const generateUrl = (course) => {
-        const href = window.location.href;
-        const root = href.substring(0, href.lastIndexOf("/"));
+        const root = window.location.origin;
         return root + "/course/" + course;
       };
       return result

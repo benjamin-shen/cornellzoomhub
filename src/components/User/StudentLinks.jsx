@@ -222,8 +222,7 @@ export function ExistingLinks({ netid, setRefresh }) {
       });
       result.sort((a, b) => (a.data.name > b.data.name ? 1 : -1));
       const generateUrl = (slug) => {
-        const href = window.location.href;
-        const root = href.substring(0, href.lastIndexOf("/"));
+        const root = window.location.origin;
         return root + "/user/link/" + slug;
       };
       return result

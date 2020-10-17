@@ -26,8 +26,7 @@ function ClassCard({ subject, number }) {
   const [loading, setLoading] = useState(true);
 
   const generateUrl = (course) => {
-    const href = window.location.href;
-    const root = href.substring(0, href.lastIndexOf("/"));
+    const root = window.location.origin;
     return root + "/course/" + course;
   };
 
@@ -42,25 +41,24 @@ function ClassCard({ subject, number }) {
   }, [linkInput]);
 
   useEffect(() => {
-
     if (loading) {
       const prePopulate = async () => {
         await courses
-        .doc(subject)
-        .collection(number + "")
-        .doc("default")
-        .get()
-        .then(res => {
-          const data = res.data();
-          setLinkInput(data.link);
-          setBackgroundUrlLink(data.link);
-          setWhitelistString(data.netids.join('\n'));
-        })
-      }
+          .doc(subject)
+          .collection(number + "")
+          .doc("default")
+          .get()
+          .then((res) => {
+            const data = res.data();
+            setLinkInput(data.link);
+            setBackgroundUrlLink(data.link);
+            setWhitelistString(data.netids.join("\n"));
+          });
+      };
       prePopulate();
       setLoading(false);
     }
-  }, [loading, number, subject])
+  }, [loading, number, subject]);
   const handleLinkChange = (event) => {
     setLinkInput(event.target.value);
   };
@@ -73,7 +71,7 @@ function ClassCard({ subject, number }) {
     await addWhitelist(whitelistString);
     setModal(false);
     setBackgroundUrlLink(urlLink);
-  }
+  };
 
   const addLink = async (url) => {
     if (!url) {
@@ -154,7 +152,12 @@ function ClassCard({ subject, number }) {
               onChange={handleWhitelistChange}
             />
             {error && <p className="text-danger">{error}</p>}
-            {pending && (<div> Link updating... <br /> </div>)}
+            {pending && (
+              <div>
+                {" "}
+                Link updating... <br />{" "}
+              </div>
+            )}
             <button type="submit" className="btn btn-outline-primary">
               Set redirect link
             </button>
@@ -169,10 +172,14 @@ function ClassCard({ subject, number }) {
       >
         <li className="bg-light">
           <h2>{course}</h2>
-          {urlLink !== "" && <p className="text-dark"> {generateUrl(course)} </p>}
-          {<p className={cornellZoomLink ? "text-success" : "text-info"}>
-            {backgroundUrlLink}
-          </p>}
+          {urlLink !== "" && (
+            <p className="text-dark"> {generateUrl(course)} </p>
+          )}
+          {
+            <p className={cornellZoomLink ? "text-success" : "text-info"}>
+              {backgroundUrlLink}
+            </p>
+          }
           {/* // TODO add link as in student page */}
         </li>
       </Link>

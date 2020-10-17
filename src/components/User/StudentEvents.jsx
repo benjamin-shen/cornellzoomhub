@@ -268,8 +268,7 @@ export function EventLinks({ netid, setRefresh }) {
         }
       }
       const generateUrl = (slug) => {
-        const href = window.location.href;
-        const root = href.substring(0, href.lastIndexOf("/"));
+        const root = window.location.origin;
         return root + "/event/" + slug;
       };
       return result
