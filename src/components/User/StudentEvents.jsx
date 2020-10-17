@@ -312,7 +312,5 @@ export function EventLinks({ netid, setRefresh }) {
     });
   }, [eventsArray, netid, setRefresh]);
 
-  return (
-    <div className="course-links">{!!links.length && <ul>{links}</ul>}</div>
-  );
+  return <div className="links">{!!links.length && <ul>{links}</ul>}</div>;
 }

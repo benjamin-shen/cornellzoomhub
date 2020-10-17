@@ -24,3 +24,22 @@
 .user li p {
   margin: 0;
 }
+.user .back-button {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+.user .signout-button {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+
+@media only screen and (max-width: 600px) {
+  .user .back-button {
+    position: relative;
+  }
+  .user .signout-button {
+    position: relative;
+  }
+}

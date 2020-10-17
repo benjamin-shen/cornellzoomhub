@@ -265,7 +265,7 @@ export function ExistingLinks({ netid, setRefresh }) {
   }, [linkDocs, netid, setRefresh]);
 
   return (
-    <div className="personal-links">
+    <div className="links">
       {!!links.length && <ul>{links}</ul>}
       {!!links.length && lastUpdated && <p>{"Last Updated: " + lastUpdated}</p>}
     </div>
